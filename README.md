@@ -1,4 +1,4 @@
-# Cross-Platform Arbitrage in Cryptocurrency Prediction Markets
+# Cross-Platform Arbitrage in Prediction Markets
 
 An empirical analysis of arbitrage activity across Polymarket, Kalshi, and Binance, based on ~10.5 million trades from February 19--March 2, 2026.
 
