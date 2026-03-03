@@ -1,202 +1,135 @@
-# Polymarket 5-Min BTC Direction Prediction Bot
+# Cross-Platform Arbitrage in Cryptocurrency Prediction Markets
 
-Algorithmic trading system for Polymarket's 5-minute BTC price direction prediction markets. Built in Rust for low-latency execution with Chainlink Data Streams, digital signal processing, and compound position sizing.
+An empirical analysis of arbitrage activity across Polymarket, Kalshi, and Binance, based on ~10.5 million trades from February 19--March 2, 2026.
 
-## Strategy Overview
+**Paper**: [Full paper (PDF)](https://github.com/OffGrid0xDAO/cross-platform-arbitrage/raw/master/paper/cross_platform_arbitrage.pdf) | [Summary (PDF)](https://github.com/OffGrid0xDAO/cross-platform-arbitrage/raw/master/paper/short_results.pdf)
 
-The bot trades binary prediction markets that resolve based on whether the Chainlink oracle price moves UP or DOWN within a 5-minute window. The edge comes from a continuous EMA ribbon with price-majority direction, filtered by a 51-feature DSP quality score, noise veto, and momentum veto.
+## Key Findings
 
-### Signal Architecture
+1. **Binance-to-Polymarket latency arbitrage** -- 29 wallets achieve >98% win rates by trading Polymarket 5-min BTC markets in the final 15 seconds of each window, using Binance spot price as a free information feed. Win rates reach 97--100% when BTC moves >$80 but drop to ~50% (random) on small moves.
 
-**Primary Strategy: EMA Ribbon (t=90-110s)**
+2. **Cross-platform trade synchronization** -- 161,577 exact same-second trade pairs detected between Polymarket and Kalshi 15-min BTC markets (week 1), replicated with 148,142 pairs in the out-of-sample week 2. 1,368 opposite-side amount-matched trades in week 1; tiered matching in week 2 yields 357,724 opposite-side matches across four tolerance levels.
 
-Direction is determined by price position relative to 4 Fibonacci EMAs [55, 89, 144, 233 seconds]:
+3. **Coordinated wallet networks** -- 6 core wallets with $4.7M combined volume and $248K profit. Some wallets achieve 100% win rate with 100% Kalshi outcome alignment across hundreds of trades (p < 10^-270). Wallet persistence confirmed across both weeks.
 
-| Price vs EMAs | Direction | Logic |
-|---------------|-----------|-------|
-| Above 3-4 of 4 EMAs | **UP** | Price above majority = bullish |
-| Above 0-1 of 4 EMAs | **DOWN** | Price below majority = bearish |
-| Above exactly 2 | Alignment fallback | Use EMA ordering if \|alignment\| >= 0.50, else skip |
+4. **Oracle risk** -- 5.7--6.2% disagreement rate between Chainlink (Polymarket) and CF Benchmarks BRTI (Kalshi) makes cross-platform hedging non-risk-free, with a ~1-in-17 chance of double loss.
 
-The ribbon is **continuous** — EMA state carries across all windows without reset, providing persistent trend context.
+5. **Market structure** -- Five distinct trader strategies identified: latency arbitrageurs (93.5% win rate), cross-platform arbitrageurs (72.4%), informed traders (58.1%), market makers (51.2%), and retail (43.2%, net -$215K).
 
-**Filter Stack (applied after direction):**
+6. **Declining edge** -- Out-of-sample week 2 reveals PnL declining at -$31/window/day. Latency arb turns negative (-$0.31/trade vs +$0.49 in week 1). Only market making remains stable (~$0.20/trade both weeks).
 
-| Filter | Condition | Effect |
-|--------|-----------|--------|
-| CL Staleness Gate | CL Streams or RTDS fresh (< 5s / 60s) | Blocks all trading when data stale |
-| Noise Veto | `cl_noise <= 0.3 AND bn_noise <= 0.3` | Removes noisy market conditions |
-| Momentum Veto | `pve_aligned >= -0.13` | Blocks when exchange momentum opposes bet |
-| Quality Score | `qs >= 0.35` (7-feature weighted z-score) | Ensures sufficient signal quality |
-| Ask Price Bounds | `$0.05 <= ask <= $0.69` | Avoids extreme fills |
+## Dataset
 
-**Secondary Strategy: Sniper (t=285-298s, disabled)**
+| Source | Period | Trades | Wallets/Accounts | Markets |
+|--------|--------|--------|-------------------|---------|
+| Polymarket 5-min BTC | Feb 19--25 | 2,182,329 | 26,475 | 642 |
+| Polymarket 15-min BTC (W1) | Feb 19--25 | 2,536,367 | 7,570 | 672 |
+| Kalshi KXBTC15M (W1) | Feb 19--25 | 1,680,127 | -- | 672 |
+| Polymarket 15-min BTC (W2) | Feb 25--Mar 2 | 2,215,260 | 19,138 | 576 |
+| Kalshi KXBTC15M (W2) | Feb 25--Mar 2 | 1,894,658 | -- | 633 |
+| **Total** | **11 days** | **~10.5M** | | |
 
-Late-window cheap share entry ($0.01-$0.20 asks) with 3 DSP confirmation filters. Available but currently disabled pending more data collection.
-
-## Backtest Results
-
-### Full Dataset (1496 windows, all filters active)
-
-| Metric | Value |
-|--------|-------|
-| Trades | 770 |
-| Wins | 585 |
-| Losses | 185 |
-| Win Rate | 76.0% |
-| EV per trade (@ $0.55 fill) | +$0.210 |
-| Total P&L (@ $0.55 fill) | +$161.50 |
-| Break-even WR (@ $0.55) | 55.0% |
-
-### Last 24h (105 trades)
-
-| Metric | Value |
-|--------|-------|
-| Trades | 105 |
-| Win Rate | 76.2% |
-| EV per trade | +$0.212 |
-| P&L (@ $0.55 fill) | +$22.20 |
-
-### Quality Score Features (7 weighted z-scores)
-
-| Feature | Sign | Weight (Cohen's d) |
-|---------|------|---------------------|
-| `exchange_direction_count` | +1 (dir-normalized) | 0.481 |
-| `indicator_score` | +1 | 0.344 |
-| `cl_noise_level` | -1 | 0.337 |
-| `bollinger_width` | +1 | 0.328 |
-| `bn_noise_level` | -1 | 0.326 |
-| `trade_intensity` | +1 | 0.230 |
-| `ob_spread_vol` | -1 | 0.196 |
-
-## Architecture
+## Repository Structure
 
 ```
-src/
-├── main.rs              # CLI entry, process locking, mode selection
-├── bot.rs               # Central orchestrator: strategy loop, stop-loss, execution
-├── ribbon.rs            # EMA ribbon direction, quality score, noise veto, progression rules
-├── dsp.rs               # 51-feature DSP engine (Daubechies-4 wavelet, multi-timeframe EMA, FFT)
-├── feeds.rs             # Price feed store: CL Streams, RTDS, Binance, Coinbase, Kraken
-├── chainlink_streams.rs # Chainlink Data Streams WebSocket (primary oracle feed)
-├── chainlink_rpc.rs     # On-chain Chainlink polling (resolution verification only)
-├── executor.rs          # Polymarket CLOB: market discovery, order placement, redemption
-├── strategy.rs          # Window start price capture, multi-source signal helpers
-├── kelly.rs             # Kelly criterion position sizing with DD limiter
-├── config.rs            # All strategy parameters with defaults
-├── data_logger.rs       # CSV logging: prices, DSP ticks, boundaries, trades
-├── reconcile.rs         # On-chain P&L reconciliation via CTF contract events
-├── server.rs            # Axum HTTP dashboard API
-├── types.rs             # Direction, Signal, PriceTick, BookSnapshot
-├── cfee.rs              # Legacy: logistic regression model (disabled)
-├── conviction.rs        # Legacy: conviction strategy (disabled)
-└── copy_trade.rs        # Legacy: copy-trade strategy (disabled)
+paper/                  Research papers
+  cross_platform_arbitrage.{tex,pdf}   Full 26-page paper
+  short_results.{tex,pdf}              3-page summary of key results
 
-frontend/                # React TypeScript monitoring dashboard
-data/                    # CSV logs: price_log, boundaries, dsp_ticks, book_log
+analysis/               Analysis scripts
+  detect_arbitrage.py          6-hypothesis arbitrage detection framework (5-min markets)
+  cross_arb_15m.py             Cross-platform comparison: Polymarket vs Kalshi 15-min
+  pnl_stationarity_losses.py   P&L decomposition, stationarity, and loss distribution
+  fetch_polymarket_15m.py      Data fetcher for Polymarket 15-min BTC trades
+  fetch_kalshi_data.py         Data fetcher for Kalshi KXBTC15M trades
+  cross_platform_compare.py    Price discrepancy and timing correlation analysis
+  binance_arb_link.py          Binance-Polymarket latency arbitrage detection
+  analyze_5m_whales.py         Whale and alpha wallet analysis (5-min markets)
+  trace_arb_wallets.py         On-chain profiling of arbitrage suspect wallets
+  wallet_links.py              Cross-wallet behavioral clustering and funding traces
+  temporal_arb_detect.py       Temporal arbitrage detection across all three platforms
+
+data/                   Processed datasets (see data/README.md)
+  boundaries.csv               5-min window boundaries with Binance prices
+  cross_arb_15m_results.json   Cross-platform comparison results
+  pnl_stationarity_losses.json P&L and stationarity metrics
+  whale_analysis.json          Per-wallet analysis (26K wallets)
+  proxy_owners.json            Proxy-to-owner wallet mapping
+  multi_bridge_scan.json       Cross-chain bridge scan results
+  solana_links.json            Solana-side wallet links
 ```
 
-## Data Sources
+## Reproducing the Analysis
 
-| Source | Transport | Role | Freshness |
-|--------|-----------|------|-----------|
-| Chainlink Data Streams | WebSocket (direct) | **Primary** oracle feed for ribbon + DSP | Sub-second |
-| Chainlink RTDS | WebSocket (Polymarket relay) | Fallback oracle feed | 1-2s |
-| Chainlink On-Chain | Polygon RPC | Resolution verification only (excluded from ribbon) | ~30s |
-| Binance | WebSocket (aggTrade) | DSP cross-feed features + trade flow (VPIN) | ~100ms |
-| Coinbase | WebSocket v2 | Exchange consensus voting | ~1s |
-| Kraken | WebSocket v2 | Exchange consensus voting | ~1s |
-| Polymarket CLOB | REST + WebSocket | Order book, market discovery, execution | Real-time |
+### Prerequisites
 
-### Feed Priority for Ribbon
+```
+Python 3.10+
+pip install requests numpy pandas scipy
+```
 
-Only Chainlink Streams and RTDS feed the ribbon EMAs. On-chain Chainlink (~30s step-function updates) is deliberately excluded to prevent coarse data from corrupting the continuous EMA state. When both Streams and RTDS are stale, the bot halts trading rather than falling back to on-chain.
-
-## Execution
-
-### Order Types
-
-| Strategy | Order Type | Method |
-|----------|-----------|--------|
-| Ribbon | GTC limit (2-phase ladder) | Walk up asks until filled |
-| Sniper | FOK with retry | Immediate fill or cancel, retry up to 3x |
-| Stop-loss | FOK → GTC sell ladder | Bid FOK, 70% bid FOK, 40% bid FOK, penny GTC |
-
-### Position Management
-
-- **priceToBeat crossover**: If CL persistently crosses wrong side of oracle start price, sell early (~83% recovery)
-- **Pre-boundary marginal exit**: If CL move marginal in last 10s, sell while liquidity exists
-- **Exchange final check**: If CL ambiguous + exchanges disagree in last 5s, sell
-- **Last-resort dump**: Sell at any price in last 1.5s if losing indicators
-- **Post-boundary informed exit**: If CL confirms loss 2-10s after boundary, sell before resolution
-
-### Bet Sizing
-
-Compound sizing: `balance × 5% × kelly_mult × dd_limiter`
-
-| Ask Price | Kelly Multiplier | Effective Size |
-|-----------|-----------------|----------------|
-| <= $0.40 | 2.5x | 12.5% of bankroll |
-| <= $0.48 | 2.0x | 10.0% |
-| <= $0.55 | 1.5x | 7.5% |
-| <= $0.65 | 1.2x | 6.0% |
-| > $0.65 | 1.0x | 5.0% |
-
-DD limiter reduces size when balance < peak (drawdown protection).
-
-## Usage
+### Step 1: Fetch raw data
 
 ```bash
-# Data collection only (no trading, just log prices/DSP)
-cargo run -- --collect --asset btc
+# Polymarket 5-min BTC trades (~180 MB, takes several hours)
+python analysis/analyze_5m_whales.py
 
-# Dry run (simulated orders, real data feeds)
-cargo run -- --dry-run --asset btc
+# Polymarket 15-min BTC trades (~200 MB)
+python analysis/fetch_polymarket_15m.py
 
-# Live trading
-cargo run -- --live --asset btc
-
-# Dashboard at http://localhost:9090
+# Kalshi trades (requires API credentials)
+python analysis/fetch_kalshi_data.py
 ```
 
-## Cross-Platform Arbitrage Research
+### Step 2: Run analyses
 
-Companion research paper analyzing ~10.5 million trades across Polymarket, Kalshi, and Binance over 11 days (Feb 19 - Mar 2, 2026).
+```bash
+# Binance latency arbitrage detection
+python analysis/detect_arbitrage.py
 
-### Dataset
+# Cross-platform Polymarket vs Kalshi comparison
+python analysis/cross_arb_15m.py
 
-| Source | Period | Trades | Markets |
-|--------|--------|--------|---------|
-| Polymarket 5-min | Feb 19-25 | 2,182,329 | 642 windows |
-| Polymarket 15-min (Week 1) | Feb 19-25 | 2,536,367 | 672 markets |
-| Kalshi KXBTC15M (Week 1) | Feb 19-25 | 1,680,127 | 673 markets |
-| Polymarket 15-min (Week 2) | Feb 25-Mar 2 | 2,215,260 | 576 markets |
-| Kalshi KXBTC15M (Week 2) | Feb 25-Mar 2 | 1,894,658 | 633 markets |
-| **Grand total** | | **~10.5M** | |
+# P&L decomposition and loss analysis
+python analysis/pnl_stationarity_losses.py
 
-### Key Findings
+# On-chain wallet tracing
+python analysis/trace_arb_wallets.py
+python analysis/wallet_links.py
+```
 
-**Week 1 (Primary Analysis):**
-- **161,577 same-second trade pairs** between Polymarket and Kalshi
-- **1,368 opposite-side amount-matched trades** (textbook arb signature)
-- 29 wallets with >98% win rate on 5-min markets (latency arb via Binance)
-- 5.7% oracle disagreement rate makes cross-platform hedging non-risk-free
+### Step 3: Build paper
 
-**Week 2 (Out-of-Sample Validation):**
-- **148,142 same-second pairs** (structural synchronization persists)
-- **357,724 opposite-side matches** across four tiered tolerance levels (exact ±5%/±2s through loose ±20%/±15s)
-- 20 wallets with 100% Kalshi alignment, wallet persistence across both weeks
-- **Declining PnL**: -$31/window/day trend; latency arb turns negative (-$0.31/trade vs +$0.49 in week 1)
-- Market making alone remains stable (~$0.20/trade both weeks)
+```bash
+cd paper
+pdflatex cross_platform_arbitrage.tex
+pdflatex short_results.tex
+```
 
-### Papers
+## Methodology
 
-- `paper/cross_platform_arbitrage.pdf` — Full research paper (25+ pages)
-- `paper/short_results.pdf` — 2-page executive summary
+The analysis uses a six-hypothesis testing framework:
 
-## Requirements
+- **H1**: Latency arbitrage -- wallets trading in final seconds correlate with exchange price moves
+- **H2**: Sell-cluster arbitrage -- NegRisk minting arbitrage via simultaneous opposite-side sells
+- **H3**: Binance correlation -- trade timing and direction linked to BTC/USDT spot movements
+- **H4**: Coordinated market making -- synchronized liquidity provision across platforms
+- **H5**: Oracle divergence exploitation -- profiting from Chainlink vs CF Benchmarks disagreements
+- **H6**: Cross-platform hedging -- matched opposite-side positions on Polymarket and Kalshi
 
-- Polygon wallet with USDC + MATIC for gas
-- Alchemy RPC endpoint (Polygon mainnet)
-- Chainlink Data Streams API credentials (testnet key works)
-- Stable network connection (< 100ms latency to exchanges)
+All six hypotheses are confirmed with statistical significance. See the [full paper](paper/cross_platform_arbitrage.pdf) for details.
+
+## Citation
+
+```bibtex
+@article{chainsaw2026crossplatform,
+  title={Cross-Platform Arbitrage in Cryptocurrency Prediction Markets: An Empirical Analysis},
+  author={Chainsaw Research},
+  year={2026},
+  month={March}
+}
+```
+
+## License
+
+This research is provided for educational and academic purposes. The analysis scripts and data are released under the MIT License.
