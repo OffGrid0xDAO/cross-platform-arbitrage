@@ -2,7 +2,7 @@
 
 An empirical analysis of arbitrage activity across Polymarket, Kalshi, and Binance, based on 6.4 million trades from February 19--25, 2026.
 
-**Paper**: [Full paper (PDF)](paper/cross_platform_arbitrage.pdf?raw=true) | [Summary (PDF)](paper/short_results.pdf?raw=true)
+**Paper**: [Full paper (PDF)](https://github.com/OffGrid0xDAO/cross-platform-arbitrage/raw/master/paper/cross_platform_arbitrage.pdf) | [Summary (PDF)](https://github.com/OffGrid0xDAO/cross-platform-arbitrage/raw/master/paper/short_results.pdf)
 
 ## Key Findings
 
