@@ -124,7 +124,7 @@ All six hypotheses are confirmed with statistical significance. See the [full pa
 ```bibtex
 @article{chainsaw2026crossplatform,
   title={Cross-Platform Arbitrage in Cryptocurrency Prediction Markets: An Empirical Analysis},
-  author={Chainsaw Research},
+  author={0x0010110},
   year={2026},
   month={March}
 }
