@@ -161,7 +161,7 @@ cargo run -- --live --asset btc
 
 ## Cross-Platform Arbitrage Research
 
-Companion research paper analyzing ~10.5 million trades across Polymarket, Kalshi, and Binance over two weeks (Feb 19 - Mar 2, 2026).
+Companion research paper analyzing ~10.5 million trades across Polymarket, Kalshi, and Binance over 11 days (Feb 19 - Mar 2, 2026).
 
 ### Dataset
 
