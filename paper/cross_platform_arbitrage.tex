@@ -54,7 +54,7 @@
 \fancyhf{}
 \fancyhead[L]{\small Cross-Platform Prediction Market Arbitrage}
 \fancyhead[R]{\small \thepage}
-\fancyfoot[C]{\small February 2026}
+\fancyfoot[C]{\small March 2026}
 
 % ═══════════════════════════════════════════════════════════════════
 % Title
@@ -68,7 +68,7 @@
 \author{
     Chainsaw Research
 }
-\date{February 2026}
+\date{March 2026}
 
 \begin{document}
 \maketitle
@@ -77,18 +77,18 @@
 % Abstract
 % ═══════════════════════════════════════════════════════════════════
 \begin{abstract}
-We present an empirical analysis of cross-platform arbitrage in cryptocurrency prediction markets, documenting two distinct arbitrage channels: \textbf{Binance $\to$ Polymarket latency arbitrage} on 5-minute BTC markets, and \textbf{Polymarket $\leftrightarrow$ Kalshi temporal synchronization} on 15-minute BTC markets. Our dataset covers 6.4 million trades: Polymarket 5-min (2,182,329 trades, 26,475 wallets, 642 windows), Polymarket 15-min (2,536,367 trades, 7,570 wallets, 672 markets), and 1,680,127 Kalshi KXBTC15M trades across 672 matched windows from February 19--25, 2026.
+We present an empirical analysis of cross-platform arbitrage in cryptocurrency prediction markets, documenting two distinct arbitrage channels: \textbf{Binance $\to$ Polymarket latency arbitrage} on 5-minute BTC markets, and \textbf{Polymarket $\leftrightarrow$ Kalshi temporal synchronization} on 15-minute BTC markets. Our dataset spans two periods---a primary analysis (Feb 19--25, 2026) and an out-of-sample validation week (Feb 25--Mar 2, 2026)---covering approximately \textbf{10.5 million trades} in total: Polymarket 5-min (2,182,329 trades, 26,475 wallets, 642 windows), Polymarket 15-min (4,751,627 trades across both weeks), and Kalshi KXBTC15M (3,574,785 trades across both weeks).
 
 On 5-minute markets, we identify 29 wallets achieving $>$98\% win rates by trading in the final 15 seconds of each window, using Binance BTC price as a free information feed. These wallets show 97--100\% win rates when Binance moves $>$\$80, but $\sim$50\% (random) on small moves---their entire alpha comes from real-time exchange data.
 
-On 15-minute markets, we perform second-by-second cross-platform trade matching and discover \textbf{161,577 exact same-second trade pairs} between Polymarket and Kalshi, with sync rates reaching 89.2\% in individual windows. We find \textbf{1,368 opposite-side amount-matched trades} (same dollar amount $\pm$20\%, within $\pm$5 seconds, opposite directions)---the direct signature of automated cross-platform arbitrage. We identify 1,810 Polymarket wallets with $>$58\% Kalshi outcome alignment, including wallets achieving 100\% win rate and 100\% Kalshi alignment across hundreds of trades ($p < 10^{-270}$). Despite 6.9\% average price spreads between platforms, the 5.7\% oracle disagreement rate (Chainlink vs.\ CF Benchmarks BRTI) makes cross-platform hedging non-risk-free: any hedged position faces a 1-in-18 chance of double loss.
+On 15-minute markets, we perform second-by-second cross-platform trade matching and discover \textbf{161,577 exact same-second trade pairs} between Polymarket and Kalshi in week~1, replicated with \textbf{148,142 same-second pairs} in the out-of-sample week~2. We find \textbf{1,368 opposite-side amount-matched trades} in week~1 and introduce a tiered matching methodology in week~2 yielding \textbf{357,724 opposite-side matches} across four tolerance tiers. We identify 1,810 Polymarket wallets with $>$58\% Kalshi outcome alignment in week~1 and 1,261 in week~2, with wallets persisting across both periods at 100\% alignment. Despite 6.9\% average price spreads between platforms, the 5.7--6.2\% oracle disagreement rate (Chainlink vs.\ CF Benchmarks BRTI) makes cross-platform hedging non-risk-free. Crucially, the out-of-sample week reveals a \textbf{declining PnL trend} ($-$\$31/window/day), suggesting the arbitrage opportunity is being competed away even as the structural mechanism persists.
 \end{abstract}
 
 % ═══════════════════════════════════════════════════════════════════
 \section{Overview}
 % ═══════════════════════════════════════════════════════════════════
 
-We analyze \textbf{6.4 million trades} across Polymarket, Kalshi, and Binance (Feb 19--25, 2026) to document two arbitrage channels:
+We analyze \textbf{approximately 10.5 million trades} across Polymarket, Kalshi, and Binance over two periods (Feb 19--25 and Feb 25--Mar 2, 2026) to document two arbitrage channels:
 
 \begin{enumerate}[nosep]
     \item \textbf{Binance $\to$ Polymarket (5-min):} 29 wallets achieve $>$98\% win rates by watching Binance BTC price and trading Polymarket in the final seconds before resolution.
@@ -136,6 +136,7 @@ Polymarket's 5-min BTC markets are NegRisk binary options on Polygon (Chainlink 
     \item Quantification of the 5.7\% oracle disagreement rate between Chainlink and CF Benchmarks BRTI that makes cross-platform hedging non-risk-free.
     \item A six-hypothesis testing framework for detecting arbitrage behavior in prediction market trade data.
     \item Per-strategy P\&L decomposition accounting for fees, gas, and slippage; temporal stationarity analysis showing whether arb opportunities persist or decay; and a loss distribution quantifying who funds arbitrage profits (market makers, retail, other bots).
+    \item Out-of-sample validation on a second week of data ($\sim$4.1M trades, Feb 25--Mar 2) confirming structural persistence of cross-platform synchronization while revealing declining per-trade profitability ($-$\$31/window/day trend).
 \end{itemize}
 
 % ═══════════════════════════════════════════════════════════════════
@@ -145,7 +146,7 @@ Polymarket's 5-min BTC markets are NegRisk binary options on Polygon (Chainlink 
 
 \subsection{Dataset}
 
-Our dataset spans February 19--25, 2026, comprising three data sources:
+Our dataset spans two periods: a primary analysis week (February 19--25, 2026) and an out-of-sample validation week (February 25--March 2, 2026), comprising four data sources:
 
 \begin{table}[H]
 \centering
@@ -155,25 +156,34 @@ Our dataset spans February 19--25, 2026, comprising three data sources:
 \toprule
 \textbf{Source} & \textbf{Metric} & \textbf{Value} \\
 \midrule
-\multirow{4}{*}{Polymarket 5-min} & Trades & 2,182,329 \\
+\multirow{4}{*}{Polymarket 5-min (Week 1)} & Trades & 2,182,329 \\
 & Unique wallets & 26,475 \\
 & Market windows & 642 \\
 & Boundary records (w/ Binance) & 929 \\
 \midrule
-\multirow{4}{*}{Polymarket 15-min} & Trades & 2,536,367 \\
+\multirow{4}{*}{Polymarket 15-min (Week 1)} & Trades & 2,536,367 \\
 & Markets found & 672 \\
 & Resolutions (Up / Down) & 353 / 319 \\
 & Avg trades per market & 3,774 \\
 \midrule
-\multirow{5}{*}{Kalshi KXBTC15M} & Trades & 1,680,127 \\
+\multirow{5}{*}{Kalshi KXBTC15M (Week 1)} & Trades & 1,680,127 \\
 & Markets & 673 (665 with trades) \\
 & Total volume (contracts) & 88,050,035 \\
 & Avg volume per market & 130,832 \\
 & Max volume (single market) & 426,659 \\
 \midrule
-\multicolumn{2}{@{}l}{\textbf{Combined total trades}} & \textbf{6,398,823} \\
-\multicolumn{2}{@{}l}{Date range} & Feb 19--25, 2026 \\
-\multicolumn{2}{@{}l}{Matched cross-platform windows} & 672 \\
+\multirow{3}{*}{Polymarket 15-min (Week 2)} & Trades & 2,215,260 \\
+& Markets found & 576 \\
+& Unique wallets & 19,138 \\
+\midrule
+\multirow{2}{*}{Kalshi KXBTC15M (Week 2)} & Trades & 1,894,658 \\
+& Markets & 633 \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Week 1 total trades}} & \textbf{6,398,823} \\
+\multicolumn{2}{@{}l}{\textbf{Week 2 total trades}} & \textbf{4,109,918} \\
+\multicolumn{2}{@{}l}{\textbf{Grand total trades}} & \textbf{$\sim$10.5M} \\
+\multicolumn{2}{@{}l}{Date range} & Feb 19--Mar 2, 2026 \\
+\multicolumn{2}{@{}l}{Matched cross-platform windows (W1 / W2)} & 672 / 564 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1030,10 +1040,146 @@ This mirrors the latency arbitrage dynamic in traditional equities, where HFT fi
 
 % ═══════════════════════════════════════════════════════════════════
 \newpage
+\section{Out-of-Sample Validation (Feb 25--Mar 2)}
+% ═══════════════════════════════════════════════════════════════════
+
+To test whether the arbitrage patterns documented in Sections 3--8 persist beyond the initial observation window, we collected a second week of 15-minute cross-platform data (Feb 25--Mar 2, 2026). This validation period is fully out-of-sample: all thresholds, classifications, and hypotheses were fixed on week~1 data before week~2 collection began. The 5-minute Binance analysis was not re-run; those findings (Section~3--5) remain based on week~1 only.
+
+\subsection{Week 2 Dataset}
+
+\begin{table}[H]
+\centering
+\caption{Week 2 dataset summary (Feb 25--Mar 2, 2026)}
+\label{tab:week2_dataset}
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Source} & \textbf{Metric} & \textbf{Value} \\
+\midrule
+\multirow{3}{*}{Polymarket 15-min} & Trades & 2,215,260 \\
+& Markets & 576 \\
+& Unique wallets & 19,138 \\
+\midrule
+\multirow{2}{*}{Kalshi KXBTC15M} & Trades & 1,894,658 \\
+& Markets & 633 \\
+\midrule
+\multicolumn{2}{@{}l}{Combined week 2 trades} & 4,109,918 \\
+\multicolumn{2}{@{}l}{Matched cross-platform windows} & 564 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Cross-Platform Synchronization: Week 1 vs Week 2}
+
+The core finding---automated same-second trade execution across platforms---replicates cleanly:
+
+\begin{table}[H]
+\centering
+\caption{Cross-platform sync comparison}
+\label{tab:sync_comparison}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Metric} & \textbf{Week 1} & \textbf{Week 2} \\
+\midrule
+Matched windows & 672 & 564 \\
+Same-second trade pairs & 161,577 & 148,142 \\
+Within $\pm$3s pairs & 216,338 & 188,741 \\
+Top window sync rate & 89.2\% & 89.1\% \\
+Oracle agreement & 94.3\% & 93.8\% \\
+Mean price spread & 6.94\% & 6.86\% \\
+Arb-profitable windows & 25.8\% & 29.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Week~2 produces 148,142 same-second pairs (vs.\ 161,577 in week~1)---8.3\% fewer, proportional to the smaller number of matched windows (564 vs.\ 672). Per-window sync intensity is essentially unchanged. The oracle disagreement rate ticks up slightly to 6.2\% (vs.\ 5.7\%), consistent with continued use of different settlement oracles (Chainlink vs.\ CF Benchmarks BRTI).
+
+\subsection{Tiered Amount Matching}
+
+Week~2 introduces a refined tiered matching methodology that relaxes dollar tolerance and time tolerance in stages, revealing the depth of cross-platform coordination:
+
+\begin{table}[H]
+\centering
+\caption{Tiered amount matching (week 2)}
+\label{tab:tiered_matching}
+\begin{tabular}{@{}lccrrr@{}}
+\toprule
+\textbf{Tier} & \textbf{\$ Tol.} & \textbf{$\Delta t$ Tol.} & \textbf{Matches} & \textbf{Opp-Side} & \textbf{Opp\%} \\
+\midrule
+Exact   & $\pm$5\%  & $\pm$2s  & 245,292 & 125,682 & 51.2\% \\
+Tight   & $\pm$10\% & $\pm$5s  & 253,189 & 129,175 & 51.0\% \\
+Medium  & $\pm$15\% & $\pm$10s & 139,267 & 71,381  & 51.3\% \\
+Loose   & $\pm$20\% & $\pm$15s & 60,264  & 31,486  & 52.2\% \\
+\midrule
+\textbf{Total} & & & \textbf{698,012} & \textbf{357,724} & \textbf{51.2\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The consistent $\sim$51\% opposite-side rate across all tiers---slightly above the 50\% random baseline---confirms that cross-platform hedging activity is real but represents a minority of the matched volume. The sheer scale (698K matches, 358K opposite-side) across just 564 windows demonstrates pervasive automated cross-platform execution.
+
+\subsection{Wallet Persistence}
+
+Do the same wallets operate across both weeks?
+
+\begin{itemize}[nosep]
+    \item \textbf{9,464 wallets} have 3+ amount-matched trades in week~2, led by \texttt{0xe041...f2e5} (25,393 matches)---the same wallet that topped the co-trading table in week~1 (Table~\ref{tab:cotrade}).
+    \item \texttt{0xabb4...5ff4} appears in the 100\% Kalshi-aligned list in \textbf{both} weeks (64 trades in week~1, 68 in week~2), providing direct evidence of persistent cross-platform arbitrage infrastructure.
+    \item Week~2 produces \textbf{20 wallets with 100\% Kalshi alignment}, led by \texttt{0x2dce...305d} (2,052 trades, 99.6\% WR, 100\% K\_Align). Total wallets with $>$58\% alignment: 1,261 (vs.\ 1,810 in week~1).
+\end{itemize}
+
+\subsection{PnL Stationarity: The Declining Edge}
+
+The most important validation finding: \textbf{arbitrage profitability is declining}.
+
+\begin{table}[H]
+\centering
+\caption{Day-by-day arbitrage activity (week 2, all arb strategies combined)}
+\label{tab:week2_temporal}
+\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+\textbf{Date} & \textbf{Windows} & \textbf{Arb Trades} & \textbf{WR} & \textbf{PnL} & \textbf{PnL/Win} & \textbf{Active} & \textbf{New} \\
+\midrule
+Feb 25 & 96 & 61,707  & 85.0\% & \$27,589 & \$287.4 & 1,523 & 1,523 \\
+Feb 26 & 96 & 65,488  & 83.7\% & \$10,877 & \$113.3 & 1,603 & 201 \\
+Feb 27 & 96 & 62,264  & 78.7\% & $-$\$25,947 & $-$\$270.3 & 1,564 & 151 \\
+Feb 28 & 96 & 57,455  & 80.3\% & $-$\$6,736 & $-$\$70.2 & 1,515 & 93 \\
+Mar 1  & 96 & 69,207  & 75.4\% & \$11,274 & \$117.4 & 1,438 & 81 \\
+Mar 2  & 96 & 75,295  & 76.9\% & \$2,428  & \$25.3  & 1,477 & 50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Week~1 showed a stable opportunity: mean PnL/window = \$225.66, slope = $-$\$11.12/day ($<$5\% of mean). Week~2 tells a different story: \textbf{mean PnL/window = \$33.83, slope = $-$\$31.37/day}. Two days (Feb~27, Feb~28) are outright negative. The latency arb strategy, which earned +\$0.49/trade in week~1, drops to \textbf{$-$\$0.31/trade} in week~2---the edge has inverted. Sell-cluster and informed strategies show similar degradation (Table~\ref{tab:week2_pertrade}).
+
+\begin{table}[H]
+\centering
+\caption{Per-trade economics comparison: week 1 vs week 2}
+\label{tab:week2_pertrade}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Strategy} & \textbf{W1 Edge/Trade} & \textbf{W2 Edge/Trade} & \textbf{W1 Net PnL} & \textbf{W2 Net PnL} \\
+\midrule
+Latency Arb   & \$0.492  & $-$\$0.312 & \$26,175  & $-$\$12,541 \\
+Sell-Cluster  & \$0.189  & \$0.048   & \$27,035  & \$4,837 \\
+Market Making & \$0.210  & \$0.200   & \$366,599 & \$300,573 \\
+Informed      & \$0.417  & \$0.113   & \$94,070  & \$23,276 \\
+Retail        & $-$\$0.837 & $-$\$0.690 & $-$\$214,508 & $-$\$159,808 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Market making remains stable ($\sim$\$0.20/trade in both weeks), consistent with structural spread capture rather than informational edge. Retail losses decrease in magnitude ($-$\$0.69 vs.\ $-$\$0.84/trade), possibly reflecting reduced participation as the market matures.
+
+\paragraph{Interpretation.} The structural mechanism persists (Binance price leads both platforms' oracles), but competition has eroded the extractable edge. The number of arb wallets stabilizes at $\sim$1,500/day---the same as week~1---but they split a shrinking pie. This is the expected lifecycle of a publicly visible arbitrage: structural persistence with economic decay.
+
+% ═══════════════════════════════════════════════════════════════════
+\newpage
 \section{Conclusion}
 % ═══════════════════════════════════════════════════════════════════
 
-We document two distinct arbitrage channels operating across cryptocurrency prediction markets, analyzing 6.4 million trades over 5.6 days.
+We document two distinct arbitrage channels operating across cryptocurrency prediction markets, analyzing approximately 10.5 million trades over two weeks (Feb 19--Mar 2, 2026).
 
 \subsection{Channel 1: Binance $\to$ Polymarket (5-Minute Markets)}
 
@@ -1066,7 +1212,11 @@ However, cross-platform arbitrage is \textbf{not risk-free}: the 5.7\% oracle di
 
 Both channels are driven by the same underlying dynamic: \textbf{Binance BTC price as the universal information source}. On 5-minute markets, traders watch Binance and race to Polymarket. On 15-minute markets, the same signal drives simultaneous activity on both Polymarket and Kalshi, creating the synchronized volume bursts and same-second trade pairs we observe.
 
-The economic analysis (Section~8) decomposes \$325K in net profits across five strategy types and shows the opportunity is temporally stable (PnL/window slope $<$5\% of mean). On-chain adverse selection analysis shows market makers are the primary counterparty (74.8\%, \$543K single-venue), but they likely offset most of this cost through spread capture, maker rebates, and delta hedges on centralized exchanges. Retail traders (17.5\%, \$127K, 2.88\textcent-per-dollar) are the participants least likely to hedge, making them the ultimate bearers of the information asymmetry cost.
+The economic analysis (Section~8) decomposes \$325K in net profits across five strategy types and shows the opportunity is temporally stable within week~1 (PnL/window slope $<$5\% of mean). On-chain adverse selection analysis shows market makers are the primary counterparty (74.8\%, \$543K single-venue), but they likely offset most of this cost through spread capture, maker rebates, and delta hedges on centralized exchanges. Retail traders (17.5\%, \$127K, 2.88\textcent-per-dollar) are the participants least likely to hedge, making them the ultimate bearers of the information asymmetry cost.
+
+\subsection{Two-Week Validation}
+
+The out-of-sample analysis (Section~9) confirms that the structural mechanism persists into week~2 (148,142 same-second pairs, 93.8\% oracle agreement, 20 wallets with 100\% Kalshi alignment) while revealing that the \textbf{economic opportunity is declining}: PnL/window drops from \$225.66 to \$33.83, with a trend of $-$\$31/window/day. Latency arbitrage---the highest per-trade edge in week~1---turns negative in week~2 ($-$\$0.31/trade). Only market making maintains stable returns across both periods. The arbitrage lifecycle is clear: structural persistence with economic decay as competition erodes the extractable surplus.
 
 The wallets involved are listed in full in Appendix~\ref{app:wallets}. For on-chain identity tracing (Safe owner extraction, bridge scanning) of these wallets, see Appendix~\ref{app:onchain}.
 

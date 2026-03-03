@@ -19,7 +19,7 @@
 \title{\textbf{Cross-Platform Arbitrage in Crypto Prediction Markets}\\[0.3em]
 \large Short Results Summary}
 \author{Chainsaw Research}
-\date{February 2026}
+\date{March 2026}
 
 \begin{document}
 \maketitle
@@ -36,13 +36,13 @@ Find cases of automatic arbitrage trading between two prediction markets. Provid
 \toprule
 \textbf{Pair} & \textbf{Instrument} & \textbf{Data} \\
 \midrule
-Polymarket $\leftrightarrow$ Kalshi & BTC 15-min binary options & 4.2M trades, 672 matched windows \\
+Polymarket $\leftrightarrow$ Kalshi & BTC 15-min binary options & 8.3M trades, 672+564 windows \\
 Binance $\to$ Polymarket & BTC spot $\to$ 5-min binaries & 2.2M trades, 642 windows \\
 \bottomrule
 \end{tabular}
 
 \medskip
-\noindent\textbf{Period:} Feb 19--25, 2026 \quad \textbf{Total trades:} 6.4 million
+\noindent\textbf{Period:} Feb 19--Mar 2, 2026 (two weeks) \quad \textbf{Total trades:} $\sim$10.5 million
 
 % ─────────────────────────────────────────────────────────────
 \section*{Arbitrage Patterns Found}
@@ -73,7 +73,19 @@ Binance $\to$ Polymarket & BTC spot $\to$ 5-min binaries & 2.2M trades, 642 wind
     \item 6 core wallets execute 209,201 trades with sub-second coordination, \$4.7M volume, \$248K profit
 \end{itemize}
 
-\textbf{Key risk:} 5.7\% oracle disagreement (Chainlink vs CF Benchmarks BRTI) means 1-in-18 chance of double loss---cross-platform arb is \textbf{not risk-free}.
+\textbf{Key risk:} 5.7--6.2\% oracle disagreement (Chainlink vs CF Benchmarks BRTI) means $\sim$1-in-17 chance of double loss---cross-platform arb is \textbf{not risk-free}.
+
+% ─────────────────────────────────────────────────────────────
+\section*{Week 2 Validation (Feb 25--Mar 2)}
+
+Out-of-sample replication on 4.1M additional trades confirms:
+\begin{itemize}[nosep]
+    \item \textbf{148,142 same-second pairs} (vs 161,577 in week 1)---structural synchronization persists
+    \item \textbf{357,724 opposite-side amount-matched trades} across four tolerance tiers
+    \item \textbf{20 wallets with 100\% Kalshi alignment} (led by 2,052-trade wallet at 99.6\% WR)
+    \item \textbf{Declining PnL}: $-$\$31/window/day trend; latency arb turns negative ($-$\$0.31/trade vs +\$0.49 in week 1)
+    \item Market making alone remains stable ($\sim$\$0.20/trade both weeks)
+\end{itemize}
 
 % ─────────────────────────────────────────────────────────────
 \section*{Hypotheses Tested}
