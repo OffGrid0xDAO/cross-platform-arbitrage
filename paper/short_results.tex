@@ -1,0 +1,143 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    urlcolor=blue!70!black,
+}
+
+\pagestyle{empty}
+
+\title{\textbf{Cross-Platform Arbitrage in Crypto Prediction Markets}\\[0.3em]
+\large Short Results Summary}
+\author{Chainsaw Research}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+% ─────────────────────────────────────────────────────────────
+\section*{Task}
+Find cases of automatic arbitrage trading between two prediction markets. Provide proof why trades on one market are connected with trades on another. Identify patterns, test hypotheses, report what worked and what didn't.
+
+% ─────────────────────────────────────────────────────────────
+\section*{Markets Analyzed}
+
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Pair} & \textbf{Instrument} & \textbf{Data} \\
+\midrule
+Polymarket $\leftrightarrow$ Kalshi & BTC 15-min binary options & 4.2M trades, 672 matched windows \\
+Binance $\to$ Polymarket & BTC spot $\to$ 5-min binaries & 2.2M trades, 642 windows \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\noindent\textbf{Period:} Feb 19--25, 2026 \quad \textbf{Total trades:} 6.4 million
+
+% ─────────────────────────────────────────────────────────────
+\section*{Arbitrage Patterns Found}
+
+\subsection*{Pattern 1: Binance $\to$ Polymarket Latency Arbitrage}
+
+\textbf{Mechanism.} Bots watch BTC price on Binance in real-time. When BTC moves enough to determine the 5-min binary outcome, they trade on Polymarket in the final seconds before resolution.
+
+\textbf{Proof.}
+\begin{itemize}[nosep]
+    \item 29 wallets with $>$98\% win rate, trading in the last 15 seconds of 300-second windows
+    \item One wallet trades at avg 299.2s (0.8s before resolution), 98.6\% WR across 141 trades
+    \item Win rate is 97--100\% when Binance move $>$\$80, but $\sim$50\% (random) on small moves---\textbf{entire edge comes from exchange data}
+    \item 3-wallet staggered cascade: same operator fires at 278s, 293s, 299s across wallets
+\end{itemize}
+
+\subsection*{Pattern 2: Polymarket $\leftrightarrow$ Kalshi Cross-Platform Arb}
+
+\textbf{Mechanism.} Same operator trades opposite sides on Polymarket and Kalshi simultaneously (buy YES on one, buy NO on the other) when prices diverge.
+
+\textbf{Proof.}
+\begin{itemize}[nosep]
+    \item \textbf{161,577 same-second trade pairs} between platforms (automated co-execution)
+    \item \textbf{1,368 opposite-side amount-matched trades}: same dollar amount ($\pm$20\%), $\leq$5s apart, opposite directions---textbook arb signature
+    \item Example: \$580 Poly UP buy paired with \$513 Kalshi NO trade, 4 seconds apart
+    \item Example: exact \$4.95/\$4.95 trades, 2 seconds apart, opposite sides
+    \item \textbf{10 wallets with 100\% Kalshi outcome alignment} across 85--900 trades each ($p < 10^{-25}$)
+    \item 6 core wallets execute 209,201 trades with sub-second coordination, \$4.7M volume, \$248K profit
+\end{itemize}
+
+\textbf{Key risk:} 5.7\% oracle disagreement (Chainlink vs CF Benchmarks BRTI) means 1-in-18 chance of double loss---cross-platform arb is \textbf{not risk-free}.
+
+% ─────────────────────────────────────────────────────────────
+\section*{Hypotheses Tested}
+
+\begin{tabular}{@{}llcl@{}}
+\toprule
+\textbf{\#} & \textbf{Hypothesis} & \textbf{Result} & \textbf{Evidence} \\
+\midrule
+H1 & Latency arbitrage (exchange $\to$ Polymarket) & \textbf{True} & 29 wallets, $>$98\% WR \\
+H2 & Sell-cluster arb (NegRisk minting) & \textbf{True} & 390 wallets, 79\% sell WR \\
+H3 & Binance price-move correlation & \textbf{True} & 97.9\% vs 40\% WR by move size \\
+H4 & Cross-platform bot signatures & \textbf{True} & 6-wallet identical cluster \\
+H5 & Coordinated market making & \textbf{True} & \$1.1M two-sided volume \\
+H6 & Oracle divergence exploitation & \textbf{True} & 93.5pp WR gap by divergence \\
+\bottomrule
+\end{tabular}
+
+% ─────────────────────────────────────────────────────────────
+\section*{Economic Summary (15-min markets)}
+
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Strategy} & \textbf{Wallets} & \textbf{WR} & \textbf{Net PnL} & \textbf{Volume} \\
+\midrule
+Latency Arb & 494 & 93.5\% & \$26K & \$3.3M \\
+Sell-Cluster & 506 & 67.5\% & \$27K & \$1.1M \\
+Market Making & 3,255 & 52.4\% & \$367K & \$20.5M \\
+Informed & 1,180 & 87.1\% & \$94K & \$4.2M \\
+Retail & 7,956 & 43.2\% & $-$\$215K & \$4.4M \\
+\midrule
+\textbf{Total} & 13,391 &  & \$299K & \$33.5M \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\noindent\textbf{Who funds arb profits?} Market makers absorb 74.8\% of adverse selection (\$543K single-venue), but likely recoup via spread + maker rebates + internal hedging across wallets and platforms. Retail traders (17.5\%, \$127K) bear the real economic loss. Opportunity is temporally stable (7-day regression slope $<$5\% of mean).
+
+% ─────────────────────────────────────────────────────────────
+\section*{Why Kalshi-Side is Unidentifiable}
+
+Kalshi's public trade API exposes only \texttt{trade\_id}, price, side, and count---\textbf{no user identifiers}. We prove cross-platform activity from the Polymarket side: same-second execution, amount matching, and 100\% Kalshi outcome alignment. Linking to specific Kalshi accounts requires Kalshi's internal records.
+
+% ─────────────────────────────────────────────────────────────
+\section*{Code \& Resources}
+
+\footnotesize
+\begin{tabular}{@{}lp{9cm}@{}}
+\toprule
+\textbf{Resource} & \textbf{Description} \\
+\midrule
+\texttt{analysis/detect\_arbitrage.py} & H1--H6 hypothesis testing (5-min, 26K wallets) \\
+\texttt{analysis/cross\_arb\_15m.py} & Cross-platform Poly$\leftrightarrow$Kalshi matching \\
+\texttt{analysis/pnl\_stationarity\_losses.py} & P\&L decomposition, stationarity, loss distribution \\
+\texttt{data/poly15m/} & 672 Polymarket 15-min market JSONs (2.5M trades) \\
+\texttt{data/kalshi\_btc\_trades.json} & 1.68M Kalshi KXBTC15M trades \\
+\texttt{data/boundaries.csv} & 5-min Chainlink/Binance price boundaries \\
+\texttt{data/whale\_analysis.json} & Top 200 wallet profiles \\
+\texttt{data/cross\_arb\_15m\_results.json} & Full cross-platform analysis output \\
+\texttt{data/pnl\_stationarity\_losses.json} & Economic analysis output \\
+\bottomrule
+\end{tabular}
+\normalsize
+
+\bigskip
+\noindent\textbf{Full research paper:} \texttt{paper/cross\_platform\_arbitrage.pdf} (23 pages, all tables, methodology, and appendices with wallet addresses).
+
+\end{document}

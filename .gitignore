@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large data files (not included in repo)
+data/whale_cache.json
+data/poly15m/
+data/kalshi_btc_trades.json
+data/kalshi_markets.json
+data/*.csv.gz
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+
+# Jupyter
+.ipynb_checkpoints/

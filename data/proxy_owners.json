@@ -1,0 +1,152 @@
+{
+  "timestamp": "2026-02-27T20:04:10.157226+00:00",
+  "proxy_to_owner": {
+    "0xf2eda2eca20eea27bdb0038bc3fc559e2cbb98a8": [
+      "0xd6c55f44212d654ab228640bf2bd43a3d79b7d17"
+    ],
+    "0x4602411d7a9ca3004813da8fec7b46d27d72b0f9": [
+      "0x83286f195d389e5fceb2985187a1b4a89fff9847"
+    ],
+    "0x9e51207b5fbb6cfe64d656ca73a4d8f2278b691c": [
+      "0x641cc45febd3a3898b6e40a860f3817f9b867661"
+    ],
+    "0x91176db78ea5d0d1566ee028120137e1bfaececa": [
+      "0x5dcae86178be4d5c8b2416779c5eeeee2d5e14da"
+    ],
+    "0x1d0034134e339a309700ff2d34e99fa2d48b0313": [
+      "0xab6fdd9533440c9b955aebc430674a1e464144d0"
+    ],
+    "0x1979ae6b7e6534de9c4539d0c205e582ca637c9d": [
+      "0x805580090f63146e46fcfadbc0262ba2291ff961"
+    ],
+    "0x03c3b0236c5a01051381482e77f2210349073a1d": [
+      "0x508a5c6d9f97386e74407e2a3dfd5a7bba1ff707"
+    ],
+    "0xd0d6053c3c37e727402d84c14069780d360993aa": [
+      "0x9698804c25949d7347fc1ad4228d1d6f0f2dad0e"
+    ],
+    "0x0ea574f3204c5c9c0cdead90392ea0990f4d17e4": [
+      "0x66fb7bd22fec149518d5b9240f3d12a017d76897"
+    ],
+    "0x2b41a72490ca2af2709e34368e6697cdd32fe0d3": [
+      "0x46c8f56d52145d9e2ff4b8ff007f8e7eebebeb26"
+    ]
+  },
+  "shared_owners": {},
+  "owner_bridges": {
+    "0xd6c55f44212d654ab228640bf2bd43a3d79b7d17": {
+      "bridges": [],
+      "chains": [],
+      "proxies": [
+        "0xf2eda2eca20eea"
+      ]
+    },
+    "0x83286f195d389e5fceb2985187a1b4a89fff9847": {
+      "bridges": [],
+      "chains": [
+        "Polygon"
+      ],
+      "proxies": [
+        "0x4602411d7a9ca3"
+      ]
+    },
+    "0x641cc45febd3a3898b6e40a860f3817f9b867661": {
+      "bridges": [],
+      "chains": [
+        "Polygon"
+      ],
+      "proxies": [
+        "0x9e51207b5fbb6c"
+      ]
+    },
+    "0x5dcae86178be4d5c8b2416779c5eeeee2d5e14da": {
+      "bridges": [],
+      "chains": [
+        "Polygon"
+      ],
+      "proxies": [
+        "0x91176db78ea5d0"
+      ]
+    },
+    "0xab6fdd9533440c9b955aebc430674a1e464144d0": {
+      "bridges": [],
+      "chains": [
+        "Polygon"
+      ],
+      "proxies": [
+        "0x1d0034134e339a"
+      ]
+    },
+    "0x805580090f63146e46fcfadbc0262ba2291ff961": {
+      "bridges": [],
+      "chains": [
+        "Polygon"
+      ],
+      "proxies": [
+        "0x1979ae6b7e6534"
+      ]
+    },
+    "0x508a5c6d9f97386e74407e2a3dfd5a7bba1ff707": {
+      "bridges": [
+        {
+          "bridge": "wormhole",
+          "src": 0,
+          "dst": 5,
+          "token": "?",
+          "amount": ""
+        },
+        {
+          "bridge": "wormhole",
+          "src": 0,
+          "dst": 5,
+          "token": "?",
+          "amount": "15342043357"
+        }
+      ],
+      "chains": [
+        "Polygon",
+        "Arbitrum"
+      ],
+      "proxies": [
+        "0x03c3b0236c5a01"
+      ]
+    },
+    "0x9698804c25949d7347fc1ad4228d1d6f0f2dad0e": {
+      "bridges": [],
+      "chains": [],
+      "proxies": [
+        "0xd0d6053c3c37e7"
+      ]
+    },
+    "0x66fb7bd22fec149518d5b9240f3d12a017d76897": {
+      "bridges": [],
+      "chains": [],
+      "proxies": [
+        "0x0ea574f3204c5c"
+      ]
+    },
+    "0x46c8f56d52145d9e2ff4b8ff007f8e7eebebeb26": {
+      "bridges": [],
+      "chains": [
+        "Ethereum",
+        "Polygon"
+      ],
+      "proxies": [
+        "0x2b41a72490ca2a"
+      ]
+    }
+  },
+  "all_eoas": [
+    "0xd6c55f44212d654ab228640bf2bd43a3d79b7d17",
+    "0x83286f195d389e5fceb2985187a1b4a89fff9847",
+    "0x641cc45febd3a3898b6e40a860f3817f9b867661",
+    "0x5dcae86178be4d5c8b2416779c5eeeee2d5e14da",
+    "0xab6fdd9533440c9b955aebc430674a1e464144d0",
+    "0x805580090f63146e46fcfadbc0262ba2291ff961",
+    "0x508a5c6d9f97386e74407e2a3dfd5a7bba1ff707",
+    "0x9698804c25949d7347fc1ad4228d1d6f0f2dad0e",
+    "0x66fb7bd22fec149518d5b9240f3d12a017d76897",
+    "0x46c8f56d52145d9e2ff4b8ff007f8e7eebebeb26"
+  ],
+  "profiles": {}
+}

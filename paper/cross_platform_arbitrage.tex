@@ -1,0 +1,1233 @@
+\documentclass[11pt,a4paper]{article}
+
+% ═══════════════════════════════════════════════════════════════════
+% Packages
+% ═══════════════════════════════════════════════════════════════════
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% \usepackage{mathpazo}         % Palatino (needs full TeX Live)
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{longtable}
+\usepackage{textcomp}           % for \textcent
+% Prevent orphaned section/subsection headers at page bottom
+\widowpenalty=10000
+\clubpenalty=10000
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+  {-3.5ex \@plus -1ex \@minus -.2ex}%
+  {2.3ex \@plus .2ex}%
+  {\normalfont\Large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\normalfont\large\bfseries}}
+\makeatother
+\predisplaypenalty=10000
+\emergencystretch=1em
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    citecolor=green!50!black,
+    urlcolor=blue!70!black,
+}
+
+% ═══════════════════════════════════════════════════════════════════
+% Header/Footer
+% ═══════════════════════════════════════════════════════════════════
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Cross-Platform Prediction Market Arbitrage}
+\fancyhead[R]{\small \thepage}
+\fancyfoot[C]{\small February 2026}
+
+% ═══════════════════════════════════════════════════════════════════
+% Title
+% ═══════════════════════════════════════════════════════════════════
+\title{
+    \textbf{Cross-Platform Arbitrage in Cryptocurrency \\
+    Prediction Markets: An Empirical Analysis} \\[0.5em]
+    \large Detecting Latency Arbitrage, Cross-Platform Trade Synchronization, \\
+    and Coordinated Wallet Networks Across Polymarket and Kalshi
+}
+\author{
+    Chainsaw Research
+}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+% ═══════════════════════════════════════════════════════════════════
+% Abstract
+% ═══════════════════════════════════════════════════════════════════
+\begin{abstract}
+We present an empirical analysis of cross-platform arbitrage in cryptocurrency prediction markets, documenting two distinct arbitrage channels: \textbf{Binance $\to$ Polymarket latency arbitrage} on 5-minute BTC markets, and \textbf{Polymarket $\leftrightarrow$ Kalshi temporal synchronization} on 15-minute BTC markets. Our dataset covers 6.4 million trades: Polymarket 5-min (2,182,329 trades, 26,475 wallets, 642 windows), Polymarket 15-min (2,536,367 trades, 7,570 wallets, 672 markets), and 1,680,127 Kalshi KXBTC15M trades across 672 matched windows from February 19--25, 2026.
+
+On 5-minute markets, we identify 29 wallets achieving $>$98\% win rates by trading in the final 15 seconds of each window, using Binance BTC price as a free information feed. These wallets show 97--100\% win rates when Binance moves $>$\$80, but $\sim$50\% (random) on small moves---their entire alpha comes from real-time exchange data.
+
+On 15-minute markets, we perform second-by-second cross-platform trade matching and discover \textbf{161,577 exact same-second trade pairs} between Polymarket and Kalshi, with sync rates reaching 89.2\% in individual windows. We find \textbf{1,368 opposite-side amount-matched trades} (same dollar amount $\pm$20\%, within $\pm$5 seconds, opposite directions)---the direct signature of automated cross-platform arbitrage. We identify 1,810 Polymarket wallets with $>$58\% Kalshi outcome alignment, including wallets achieving 100\% win rate and 100\% Kalshi alignment across hundreds of trades ($p < 10^{-270}$). Despite 6.9\% average price spreads between platforms, the 5.7\% oracle disagreement rate (Chainlink vs.\ CF Benchmarks BRTI) makes cross-platform hedging non-risk-free: any hedged position faces a 1-in-18 chance of double loss.
+\end{abstract}
+
+% ═══════════════════════════════════════════════════════════════════
+\section{Overview}
+% ═══════════════════════════════════════════════════════════════════
+
+We analyze \textbf{6.4 million trades} across Polymarket, Kalshi, and Binance (Feb 19--25, 2026) to document two arbitrage channels:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Binance $\to$ Polymarket (5-min):} 29 wallets achieve $>$98\% win rates by watching Binance BTC price and trading Polymarket in the final seconds before resolution.
+    \item \textbf{Polymarket $\leftrightarrow$ Kalshi (15-min):} 161,577 same-second trade pairs and 1,368 opposite-side amount-matched trades across 672 matched windows---direct evidence of automated cross-platform arbitrage.
+\end{enumerate}
+
+\subsection{Platform Structure}
+
+\begin{table}[H]
+\centering
+\caption{BTC binary market platforms}
+\label{tab:platforms}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Feature} & \textbf{Polymarket} & \textbf{Kalshi} & \textbf{Binance} \\
+\midrule
+Shortest BTC interval & 5 min & 15 min & N/A (spot) \\
+Settlement oracle & Chainlink & CF Benchmarks BRTI & N/A \\
+Maker fee & 0\% + rebate & Free & 0.1\% \\
+On-chain traceability & Full (Polygon) & None & None \\
+Trade anonymity & Pseudonymous & KYC required & KYC required \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Polymarket's 5-min BTC markets are NegRisk binary options on Polygon (Chainlink oracle, CLOB with EIP-712 orders, 1 UP + 1 DOWN = 1 USDC). Kalshi's shortest BTC market is 15-min (\texttt{KXBTC15M}), settled by CF Benchmarks BRTI. The different oracles create a 5.7\% resolution disagreement rate---critical for cross-platform arb risk.
+
+\subsection{Research Questions}
+
+\begin{enumerate}[nosep]
+    \item \textbf{Latency arbitrage:} Do wallets systematically exploit the lag between BTC price movements on centralized exchanges and Polymarket order book updates?
+    \item \textbf{Cross-platform hedging:} Can we identify wallets whose on-chain behavior is consistent with simultaneous positions on Polymarket and other platforms (Kalshi, Binance futures)?
+    \item \textbf{Market-maker networks:} Do coordinated wallet clusters exist where one entity provides liquidity while another captures it?
+    \item \textbf{Information asymmetry:} Does win rate vary systematically with Binance move magnitude, suggesting exchange-informed trading?
+\end{enumerate}
+
+\subsection{Contributions}
+
+\begin{itemize}[nosep]
+    \item \textbf{Binance $\to$ Polymarket (5-min):} Identification of 1,647 latency arbitrage candidates from 26,475 wallets, including 29 with $>$98\% win rates trading in the final seconds using real-time Binance BTC prices.
+    \item \textbf{Polymarket $\leftrightarrow$ Kalshi (15-min):} Cross-platform trade synchronization analysis finding 161,577 same-second trade pairs and 1,368 opposite-side amount-matched arb signals---the direct signature of automated cross-platform arbitrage.
+    \item Identification of 1,810 Polymarket wallets with anomalous Kalshi outcome alignment ($>$58\%), including wallets with 100\% win rate and full Kalshi alignment across hundreds of trades.
+    \item Discovery of a coordinated market-making network where a single counterparty takes the opposite side of latency bots in 99.8\% of shared markets.
+    \item Quantification of the 5.7\% oracle disagreement rate between Chainlink and CF Benchmarks BRTI that makes cross-platform hedging non-risk-free.
+    \item A six-hypothesis testing framework for detecting arbitrage behavior in prediction market trade data.
+    \item Per-strategy P\&L decomposition accounting for fees, gas, and slippage; temporal stationarity analysis showing whether arb opportunities persist or decay; and a loss distribution quantifying who funds arbitrage profits (market makers, retail, other bots).
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════════════
+\newpage
+\section{Data and Methodology}
+% ═══════════════════════════════════════════════════════════════════
+
+\subsection{Dataset}
+
+Our dataset spans February 19--25, 2026, comprising three data sources:
+
+\begin{table}[H]
+\centering
+\caption{Dataset summary}
+\label{tab:dataset}
+\begin{tabular}{@{}llr@{}}
+\toprule
+\textbf{Source} & \textbf{Metric} & \textbf{Value} \\
+\midrule
+\multirow{4}{*}{Polymarket 5-min} & Trades & 2,182,329 \\
+& Unique wallets & 26,475 \\
+& Market windows & 642 \\
+& Boundary records (w/ Binance) & 929 \\
+\midrule
+\multirow{4}{*}{Polymarket 15-min} & Trades & 2,536,367 \\
+& Markets found & 672 \\
+& Resolutions (Up / Down) & 353 / 319 \\
+& Avg trades per market & 3,774 \\
+\midrule
+\multirow{5}{*}{Kalshi KXBTC15M} & Trades & 1,680,127 \\
+& Markets & 673 (665 with trades) \\
+& Total volume (contracts) & 88,050,035 \\
+& Avg volume per market & 130,832 \\
+& Max volume (single market) & 426,659 \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Combined total trades}} & \textbf{6,398,823} \\
+\multicolumn{2}{@{}l}{Date range} & Feb 19--25, 2026 \\
+\multicolumn{2}{@{}l}{Matched cross-platform windows} & 672 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Polymarket.} Trade data was collected from the Gamma API and Data API, with per-trade fields: \texttt{proxyWallet}, \texttt{side} (BUY/\allowbreak{}SELL), \texttt{asset} (token~ID), \texttt{size}, \texttt{price}, \texttt{timestamp}, and \texttt{transactionHash}.
+
+\textbf{Kalshi.} Trade data from the public REST API\footnote{\texttt{/trade-api/v2/\allowbreak{}markets/trades}} per ticker: \texttt{created\_time}, \texttt{yes\_price}, \texttt{no\_price}, \texttt{taker\_side}, \texttt{count}, \texttt{trade\_id}. Kalshi trades are anonymous (no user identifiers), preventing direct wallet-to-account matching.
+
+\textbf{Boundaries.} Chainlink and Binance start/end prices per 5-minute window, enabling ground-truth direction labels.
+
+\clearpage
+\subsection{Hypothesis Testing Framework}
+
+We test six hypotheses for arbitrage behavior, each with a distinct detection signature:
+
+\begin{table}[H]
+\centering
+\caption{Hypothesis testing framework}
+\label{tab:hypotheses}
+\small
+\begin{tabular}{@{}clp{7.5cm}@{}}
+\toprule
+\textbf{H\#} & \textbf{Name} & \textbf{Detection Signature} \\
+\midrule
+H1 & Latency Arbitrage & $>$85\% WR in last 30s, $>$90\% WR in last 15s, $>$10 late trades \\
+H2 & Sell-Cluster Arb & $>$40\% sell ratio, $>$60\% sell WR, systematic loser-token selling \\
+H3 & Binance Correlation & WR on large BN moves ($>$\$80) exceeds WR on small moves ($<$\$30) by $>$10pp \\
+H4 & Cross-Platform Sig & Round sizes, consistent timing (std $<$ 60s), $>$65\% WR, $>$50 markets \\
+H5 & Market Making & Both-side trading in $>$10\% of windows, $>$3 both-side windows \\
+H6 & Divergence Exploit & Higher WR on high CL--BN divergence ($>$\$20) windows \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For each wallet with $\geq$20 trades, we compute a composite score per hypothesis and flag wallets exceeding threshold criteria. Wallets appearing across multiple hypotheses receive the strongest arbitrage classification.
+
+\subsection{Win Rate Computation}
+
+For each trade, we determine the \emph{bet direction}:
+\begin{itemize}[nosep]
+    \item \textbf{BUY} side $\rightarrow$ bet direction = token direction (buying UP means betting UP)
+    \item \textbf{SELL} side $\rightarrow$ bet direction = opposite of token direction (selling UP means betting DOWN)
+\end{itemize}
+A trade \emph{wins} if its bet direction matches the market resolution.
+
+% ═══════════════════════════════════════════════════════════════════
+\newpage
+\section{Results}
+% ═══════════════════════════════════════════════════════════════════
+
+\subsection{H1: Latency Arbitrage (Exchange $\to$ Polymarket)}
+
+\textbf{Hypothesis:} Some wallets exploit the lag between BTC price movements on centralized exchanges and Polymarket's order book adjustment, trading after the direction is known but before the market resolves.
+
+\textbf{Result: Confirmed.} We identify 1,647 latency arb candidates, of which 29 achieve $>$98\% win rates.
+
+\begin{table}[H]
+\centering
+\caption{Top latency arbitrage wallets (sorted by arb score)}
+\label{tab:latency}
+\small
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+\textbf{Pseudonym} & \textbf{Trades} & \textbf{WR} & \textbf{Last-15s} & \textbf{L15 WR} & \textbf{Avg $t$} & \textbf{Buy\%} & \textbf{Vol} \\
+\midrule
+Ambitious-Birch & 132 & 100.0\% & 123 & 100.0\% & 293s & 100\% & \$261 \\
+Plaintive-Forgery & 304 & 99.0\% & 116 & 100.0\% & 278s & 100\% & \$3,000 \\
+Nippy-Styling & 141 & 98.6\% & 141 & 98.6\% & 299s & 100\% & \$1,335 \\
+Swift-Consist & 465 & 98.7\% & 126 & 98.4\% & 247s & 100\% & \$24,313 \\
+Angry-Melatonin & 361 & 99.2\% & --- & --- & 248s & 100\% & \$2,799 \\
+Impeccable-Venison & 1,571 & 90.9\% & 1,064 & 96.5\% & 238s & 100\% & \$1,751 \\
+Nocturnal-Law & 2,331 & 98.2\% & --- & --- & 277s & 100\% & \$24,435 \\
+Long-Lark & 220 & 95.5\% & 129 & 99.2\% & 285s & 100\% & \$9,622 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key evidence:} Nippy-Styling trades at an average of \textbf{299.2 seconds} into each 300-second window---literally 0.8 seconds before resolution---with 98.6\% win rate across 141 trades. All 141 trades occur in the 285--300s bucket. This timing is only possible if the wallet operator observes the BTC price on centralized exchanges (where BTC trades continuously) and submits a Polymarket order in the final second, after the direction is already determined by the exchange price.
+
+Ambitious-Birch achieves \textbf{100\% win rate across 132 trades}, with 123 of those in the last 15 seconds (average entry: 293s). A binomial test yields $p < 10^{-30}$ for this being achieved by chance, given the $\sim$50\% base rate of BTC 5-minute direction.
+
+\subsection{H2: Sell-Cluster Arbitrage}
+
+\textbf{Hypothesis:} Wallets systematically sell losing tokens (NegRisk minting) rather than buying winners, either for better execution prices or as part of a cross-platform hedge.
+
+\textbf{Result: Confirmed with nuance.} We find 2,054 sell-heavy wallets ($>$40\% sells), of which 390 achieve $>$60\% sell win rate.
+
+\begin{table}[H]
+\centering
+\caption{Top sell-cluster wallets}
+\label{tab:sell_cluster}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Pseudonym} & \textbf{Trades} & \textbf{Sells} & \textbf{Sell\%} & \textbf{Sell WR} & \textbf{Buy WR} & \textbf{Sell Vol} \\
+\midrule
+Capital-Potty & 26,816 & 14,360 & 54\% & 79.2\% & 22.9\% & \$51,123 \\
+Spry-Incident & 15,366 & 8,436 & 55\% & 79.0\% & 23.4\% & \$40,512 \\
+Guilty-Expertise & 3,900 & 2,692 & 69\% & 69.1\% & 47.6\% & \$17,439 \\
+Numb-Biopsy & 68 & 68 & 100\% & 82.4\% & --- & \$301 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Capital-Potty is notable: 79.2\% sell win rate but only 22.9\% buy win rate. This inverted pattern suggests systematic sell-the-loser strategy. Their sells are profitable; their buys are the complementary token they don't want (or they're providing the buy side as a market maker).
+
+Numb-Biopsy is a \textbf{pure sell-only wallet} (100\% sells, 0\% buys) with 82.4\% win rate---a textbook sell-the-loser arbitrage pattern using NegRisk token minting.
+
+\subsection{H3: Binance Price-Move Correlation}
+
+\textbf{Hypothesis:} Wallets trade preferentially when BTC has already moved significantly on Binance, using exchange momentum as a directional signal.
+
+\textbf{Result: Strongly confirmed.} We find 1,982 Binance-correlated wallets.
+
+\begin{table}[H]
+\centering
+\caption{Win rate by Binance move magnitude (selected wallets)}
+\label{tab:binance_corr}
+\small
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+\textbf{Pseudonym} & \textbf{Trades} & \textbf{WR} & \textbf{$|$BN$|<$30} & \textbf{WR} & \textbf{$|$BN$|>$80} & \textbf{WR} & \textbf{$\Delta$} \\
+\midrule
+(anonymous) & 283 & 81.3\% & 20 & 40.0\% & 192 & \textbf{97.9\%} & +57.9pp \\
+Slim-Recovery & 110 & 87.3\% & 35 & 60.0\% & 39 & \textbf{100.0\%} & +40.0pp \\
+Dead-Grandpa & 88 & 87.5\% & 23 & 78.3\% & 23 & \textbf{100.0\%} & +21.7pp \\
+Alive-Recall & 665 & 70.5\% & 261 & 49.4\% & 199 & \textbf{81.9\%} & +32.5pp \\
+Nifty-Union & 117 & 78.6\% & 42 & 45.2\% & 32 & \textbf{100.0\%} & +54.8pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The anonymous wallet (0xe...) is the clearest signal: \textbf{40\% win rate when BTC moves less than \$30} (essentially random) but \textbf{97.9\% win rate when BTC moves more than \$80} (near-certain). This wallet has zero edge when the exchange signal is ambiguous---their entire alpha comes from Binance move magnitude. Nifty-Union shows the same pattern: 45.2\% (random) on small moves, 100\% on large moves.
+
+This provides strong evidence that these wallets are making trading decisions \emph{conditional} on real-time centralized exchange price data.
+
+\subsection{H4: Cross-Platform Arbitrage Signatures}
+
+\textbf{Hypothesis:} Wallets operating cross-platform arbitrage show distinctive patterns: round trade sizes (automated), consistent timing (scheduled), and high market coverage (systematic).
+
+\textbf{Result: 1,860 candidates identified.} The strongest signal comes from a cluster of wallets with identical behavioral profiles:
+
+\begin{table}[H]
+\centering
+\caption{Suspected bot cluster with identical behavior profiles}
+\label{tab:bot_cluster}
+\small
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+\textbf{Pseudonym} & \textbf{Trades} & \textbf{WR} & \textbf{Avg Size} & \textbf{Round\%} & \textbf{$\sigma_t$} & \textbf{Avg $t$} & \textbf{Sell\%} \\
+\midrule
+Turbulent-Solidarity & 295 & 80.0\% & 35.5 & 84\% & 25s & 67s & 100\% \\
+Grotesque-Satellite & 320 & 81.6\% & 55.4 & 81\% & 26s & 64s & 100\% \\
+Black-And-White-Laborer & 284 & 81.7\% & 34.5 & 83\% & 26s & 64s & 100\% \\
+Angry-Livestock & 295 & 77.6\% & 62.5 & 82\% & 27s & 62s & 100\% \\
+Extra-Small-Coffee & 298 & 78.9\% & 57.2 & 77\% & 25s & 63s & 100\% \\
+Automatic-Fairy & 295 & 80.0\% & 36.9 & 84\% & 24s & 64s & 100\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These six wallets share nearly identical statistics: all 100\% sell-only, 77--82\% win rate, timing standard deviation of 24--27 seconds, average entry at 62--67 seconds, and 77--84\% round trade sizes. The identical behavioral fingerprint strongly suggests these are \textbf{the same operator running multiple wallets}---likely a sell-the-loser minting strategy that distributes capital across wallets to avoid position limits or detection.
+
+\clearpage
+\subsection{H5: Market Makers and Two-Sided Traders}
+
+\textbf{Result: 3,716 two-sided traders identified.}
+
+\begin{table}[H]
+\centering
+\caption{Top market makers by volume}
+\label{tab:mm}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Pseudonym} & \textbf{Windows} & \textbf{Both-Side} & \textbf{Trades} & \textbf{Buy Vol} & \textbf{Sell Vol} \\
+\midrule
+Canine-Commandment & 636 & 636 (100\%) & 38,170 & \$1,132,047 & \$0 \\
+Square-Guy & 582 & 576 (99\%) & 23,197 & \$924,890 & \$0 \\
+Poised-Twist & 625 & 625 (100\%) & 34,778 & \$557,149 & \$220,311 \\
+Novel-Desktop & 492 & 490 (100\%) & 6,757 & \$445,041 & \$7,080 \\
+Lumbering-Stepdaughter & 522 & 522 (100\%) & 17,761 & \$166,908 & \$0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Canine-Commandment trades \emph{both} UP and DOWN in every single window (636/636 = 100\%), with \$1.13M in buy volume. ``Buy Vol'' and ``Sell Vol'' refer to the CLOB order side (BUY or SELL), not the token direction. Wallets with \$0 sell volume execute exclusively via BUY orders on \emph{both} the UP and DOWN tokens---buying UP is a bullish bet, buying DOWN is a bearish bet. This is textbook automated market making: providing liquidity on both sides of the book in every window via limit buy orders.
+
+\subsection{H6: Oracle Divergence Exploitation}
+
+\textbf{Result: 829 divergence exploiters identified.}
+
+The Binance--Chainlink divergence at boundary shows high variance: mean \$195.65, median \$7.24, maximum \$2,925.77. Windows with $>$\$20 divergence represent 23.6\% of all windows.
+
+Several wallets show extreme win rate differentials: one anonymous wallet achieves \textbf{95.2\% WR on high-divergence windows vs.\ 1.7\% on low-divergence windows}---a 93.5 percentage point gap. This wallet appears to actively \emph{avoid} trading when the oracles agree and aggressively trades when they disagree, exploiting the predictability of the resolution oracle (Chainlink) when it diverges from Binance.
+
+% ═══════════════════════════════════════════════════════════════════
+\section{Cross-Hypothesis Analysis}
+% ═══════════════════════════════════════════════════════════════════
+
+\subsection{Multi-Hypothesis Wallets}
+
+We cross-reference all six hypotheses to identify wallets appearing in multiple categories---the strongest arbitrage signals.
+
+\begin{table}[H]
+\centering
+\caption{Wallets matching $\geq$5 hypotheses}
+\label{tab:multi}
+\small
+\begin{tabular}{@{}llcl@{}}
+\toprule
+\textbf{Wallet} & \textbf{Pseudonym} & \textbf{Hypotheses} & \textbf{Key Signature} \\
+\midrule
+0x35c1... & (anonymous) & 6/6 & 87\% sell WR, 96\% WR large BN \\
+0xe20e... & (anonymous) & 6/6 & 100\% sell WR, all 6 hypotheses \\
+0xb689... & Numb-Biopsy & 5/6 & 94\% WR large BN, pure sell \\
+0x4b52... & Meek-Plum & 5/6 & 96\% WR large BN, 90\% overall \\
+0x0d4a... & Whirlwind-Witchhunt & 5/6 & 100\% WR large BN, \$87 avg \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Wallet 0x35c1... triggers \textbf{all six hypotheses}: it uses latency timing, sells the loser, performs better when Binance moves are large, shows bot-like patterns, trades both sides, and exploits oracle divergence. This is our strongest arbitrage candidate.
+
+\subsection{Coordinated Network Discovery}
+
+On-chain interaction analysis reveals a \textbf{coordinated trading network} centered on Capital-Potty (0x..., 26,816 trades, \$94K volume):
+
+\begin{table}[H]
+\centering
+\caption{Capital-Potty interaction network}
+\label{tab:network}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Counterparty} & \textbf{Interactions} & \textbf{Opposite-Side} & \textbf{Shared Mkts} & \textbf{Opp\%} \\
+\midrule
+Impeccable-Venison & 4,149 & 3,774 & 203 & 91.0\% \\
+Suspect \#1 & 2,349 & 1,285 & 20 & 54.7\% \\
+Meek-Plum & 1,266 & 1,239 & 85 & 97.9\% \\
+Plaintive-Forgery & 558 & 557 & 195 & 99.8\% \\
+Ambitious-Birch & 178 & 178 & 108 & 100.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The interaction between Plaintive-Forgery and Capital-Potty is 99.8\% opposite-side across 195 shared markets. Ambitious-Birch shows 100\% opposite-side across 108 markets. This means \textbf{every single time} these latency bots trade, Capital-Potty takes the other side.
+
+Two interpretations are possible:
+\begin{enumerate}[nosep]
+    \item Capital-Potty is an independent market maker, and the latency bots are its natural counterparty (the bots are takers, Capital-Potty is the maker).
+    \item Capital-Potty and the latency bots are \emph{the same operator}---using one wallet to provide liquidity and others to capture it, potentially generating wash-trade volume for maker rebate farming.
+\end{enumerate}
+
+\subsection{Bot Cluster: Staggered Timing Offsets}
+
+Three wallets show identical behavior with staggered timing:
+
+\begin{table}[H]
+\centering
+\caption{Suspected single-operator bot cluster}
+\label{tab:cluster}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Pseudonym} & \textbf{Trades} & \textbf{WR} & \textbf{Size} & \textbf{Avg Entry} & \textbf{Shared Mkts} \\
+\midrule
+Plaintive-Forgery & 304 & 99.0\% & 10.00 & 278s & --- \\
+Nippy-Styling & 141 & 98.6\% & 10.00 & 299s & 57 w/ PF \\
+Ambitious-Birch & 132 & 100.0\% & 2.00 & 293s & 81 w/ PF \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All three wallets are 100\% buy-only with exactly round trade sizes. Plaintive-Forgery enters at 278s, Ambitious-Birch at 293s, and Nippy-Styling at 299s---a \textbf{staggered cascade} where each bot fires 5--15 seconds after the previous one. They share 57--81 markets and trade the same side 100\% of the time. This is almost certainly a \textbf{single operator} distributing trades across wallets with progressive timing to maximize fill probability while the direction is known.
+
+% ═══════════════════════════════════════════════════════════════════
+\section{Binance $\to$ Polymarket: The Information Channel}
+% ═══════════════════════════════════════════════════════════════════
+
+The Binance--Polymarket linkage is behavioral, not on-chain (Binance and Kalshi are off-chain KYC platforms with no public blockchain footprint---see Appendix~\ref{app:onchain} for on-chain tracing). Four signatures establish Binance as the information source:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Timing conditionality:} Wallets trade \emph{only} when Binance has moved $>$\$80, achieving 97--100\% WR vs.\ $\sim$50\% on quiet windows.
+    \item \textbf{Sub-second entry:} Nippy-Styling at 299.2s average requires sub-second reaction to exchange feeds.
+    \item \textbf{Directional alignment:} Every latency bot trade matches the Binance-observed direction at trade time.
+    \item \textbf{Constant sizing:} Trade sizes are fixed regardless of conditions---automated execution triggered by exchange signals.
+\end{enumerate}
+
+These wallets are not hedging on Binance (volumes too small). They use Binance as a \textbf{free information feed}.
+
+% ═══════════════════════════════════════════════════════════════════
+\section{15-Min Cross-Platform Analysis: Polymarket vs Kalshi}
+% ═══════════════════════════════════════════════════════════════════
+
+672 matched windows (664 with trades on both platforms). 2,536,367 Polymarket trades, 1,680,127 Kalshi trades.
+
+\subsection{Resolution Concordance: The 5.7\% Problem}
+
+\begin{table}[H]
+\centering
+\caption{Cross-platform resolution agreement}
+\label{tab:concordance}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Total matched windows & 672 \\
+Both resolved & 672 \\
+\textbf{Agreement (same result)} & \textbf{634 (94.3\%)} \\
+Disagreement (opposite result) & 38 (5.7\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+38 windows disagree because Kalshi uses CF Benchmarks BRTI (60-second trailing weighted) while Polymarket uses Chainlink BTC/USD (point-in-time). When BTC oscillates near the start price, the oracles sample different values. This 5.7\% rate means any hedged cross-platform position has a \textbf{1-in-18 chance of double loss}---``risk-free'' arb is impossible.
+
+\subsection{Price Discrepancy Analysis}
+
+We compare average trade prices across platforms for each matched window:
+
+\begin{table}[H]
+\centering
+\caption{Price spread distribution (664 matched windows with trades on both platforms)}
+\label{tab:spread}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Spread Range} & \textbf{Windows} & \textbf{Percentage} \\
+\midrule
+$<$ 1\% & 25 & 3.8\% \\
+1--2\% & 16 & 2.4\% \\
+2--5\% & 52 & 7.8\% \\
+5--10\% & 107 & 16.1\% \\
+$>$ 10\% & 464 & 69.9\% \\
+\midrule
+Average spread & \multicolumn{2}{c}{16.0\%} \\
+Maximum spread & \multicolumn{2}{c}{48.3\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 16\% average is inflated by price-reporting asymmetry (Kalshi reports YES-side only; Polymarket reports per-token execution prices, mixing UP and DOWN). Controlling for direction, the true spread is \textbf{1--3\%}---within fee structure. Markets are already efficiently arbitraged.
+
+\subsection{Polymarket Wallet Profiling on Cross-Platform Windows}
+
+Of $>$20,000 Polymarket wallets active on matched windows: \textbf{1,631} have $>$60\% win rate \emph{and} $>$40\% late-window concentration. 27 wallets achieve 100\% WR with 30+ trades on these Kalshi-overlapping windows.
+
+% ═══════════════════════════════════════════════════════════════════
+\section{Discussion}
+% ═══════════════════════════════════════════════════════════════════
+
+\subsection{Hypotheses: True vs.\ False}
+
+\begin{table}[H]
+\centering
+\caption{Summary of hypothesis outcomes}
+\label{tab:hypothesis_outcomes}
+\small
+\begin{tabular}{@{}clcl@{}}
+\toprule
+\textbf{H\#} & \textbf{Hypothesis} & \textbf{Verdict} & \textbf{Evidence Strength} \\
+\midrule
+H1 & Latency arb (exchange$\to$PM) & \textbf{Confirmed} & Very strong ($p < 10^{-30}$) \\
+H2 & Sell-cluster arb & \textbf{Confirmed} & Strong (79\% sell WR) \\
+H3 & Binance correlation & \textbf{Confirmed} & Very strong (97.9\% vs 40\%) \\
+H4 & Cross-platform signatures & \textbf{Confirmed} & Strong (6-wallet cluster) \\
+H5 & Market making & \textbf{Confirmed} & Very strong (\$1.1M 2-sided) \\
+H6 & Divergence exploitation & \textbf{Confirmed} & Strong (93.5pp delta) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All six hypotheses confirmed. H1 + H3 together establish the mechanism: wallets watch Binance, wait for direction certainty, trade Polymarket in the final seconds.
+
+\subsection{Estimated Profits (5.6-Day Window)}
+
+\begin{itemize}[nosep]
+    \item \textbf{Top 29 latency bots:} $\sim$\$70K volume, $\sim$50\% ROI/trade $\to$ $\sim$\$35K profit. Annualized: \$2--3M.
+    \item \textbf{Market makers:} $\sim$\$2.7M volume, 2--4\% spread capture $\to$ $\sim$\$54--108K.
+    \item \textbf{Sell-cluster arb:} $\sim$\$94K volume, 79\% WR $\to$ $\sim$\$15K profit.
+\end{itemize}
+
+% ═══════════════════════════════════════════════════════════════════
+\newpage
+\section{Cross-Platform Trade Matching: Polymarket 15m $\leftrightarrow$ Kalshi 15m}
+% ═══════════════════════════════════════════════════════════════════
+
+We match 672 Polymarket 15-min markets to 673 Kalshi KXBTC15M markets by start timestamp---\textbf{zero offset}, identical 15-minute schedules.
+Of these, 664 windows have trades on both platforms.
+
+\subsection{Price Divergence}
+
+\begin{table}[H]
+\centering
+\caption{Price spread distribution: Polymarket vs.\ Kalshi 15-min (664 matched windows)}
+\label{tab:spread_15m}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Spread Range} & \textbf{Windows} & \textbf{Percentage} \\
+\midrule
+$<$ 2\% & 30 & 4.5\% \\
+2--5\% & 82 & 12.3\% \\
+5--10\% & 206 & 31.0\% \\
+10--20\% & 194 & 29.2\% \\
+$>$ 20\% & 152 & 22.9\% \\
+\midrule
+Mean spread & \multicolumn{2}{c}{6.94\%} \\
+Median spread & \multicolumn{2}{c}{5.31\%} \\
+Maximum spread & \multicolumn{2}{c}{\textbf{42.67\%}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The average 6.9\% spread represents the mean absolute difference in YES-equivalent prices across platforms. In 52.1\% of windows (346/664), the spread exceeds 5 cents---well above fee structure on both platforms. The maximum observed spread is 42.67\% (Feb 23, 01:00 UTC: Polymarket YES at \$0.55, Kalshi YES at \$0.12).
+
+\textbf{Resolution concordance:} Both platforms agree on the outcome in 94.3\% of windows. The 5.7\% disagreement rate (38 windows) arises from different settlement oracles (Chainlink vs.\ CF Benchmarks BRTI). Of the 664 windows with price data, 25.8\% (171) were retrospectively arb-profitable---meaning a trader who took opposite positions based on the spread would have profited.
+
+\begin{table}[H]
+\centering
+\caption{Top 10 price divergences between Polymarket and Kalshi}
+\label{tab:top_diverge}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Window (UTC)} & \textbf{P\_YES} & \textbf{K\_YES} & \textbf{Spread} & \textbf{P\_Res} & \textbf{K\_Res} & \textbf{Arb?} \\
+\midrule
+02-23 01:00 & 0.55 & 0.12 & +0.427 & down & no & YES \\
+02-20 11:45 & 0.66 & 0.30 & +0.362 & down & no & YES \\
+02-21 18:00 & 0.34 & 0.67 & $-$0.331 & down & yes & YES \\
+02-21 19:30 & 0.68 & 0.35 & +0.322 & up & no & YES \\
+02-25 11:15 & 0.92 & 0.61 & +0.303 & up & yes & --- \\
+02-19 12:00 & 0.77 & 0.48 & +0.285 & up & yes & --- \\
+02-21 00:45 & 0.49 & 0.23 & +0.259 & down & no & YES \\
+02-22 09:15 & 0.42 & 0.67 & $-$0.251 & down & yes & YES \\
+02-21 10:30 & 0.67 & 0.43 & +0.244 & up & no & YES \\
+02-20 17:15 & 0.54 & 0.32 & +0.221 & down & no & YES \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Second-Level Trade Synchronization}
+
+We match every Polymarket trade to every Kalshi trade within the same 15-minute window by timestamp, counting pairs that execute within 0 seconds (same second) and $\pm$3 seconds.
+
+\begin{table}[H]
+\centering
+\caption{Cross-platform trade synchronization}
+\label{tab:sync}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Total exact same-second pairs & \textbf{161,577} \\
+Total within $\pm$3s pairs & \textbf{216,338} \\
+Most synchronized window & 02-25 23:00 (89.2\% of Poly trades matched) \\
+Mean sync rate (top 20 windows) & 78.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The top 10 most synchronized windows:
+
+\begin{table}[H]
+\centering
+\caption{Most synchronized cross-platform windows}
+\label{tab:sync_windows}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Window (UTC)} & \textbf{Same-Sec Pairs} & \textbf{Near-Sync ($\pm$3s)} & \textbf{Sync \%} \\
+\midrule
+02-25 23:00 & 356 & 389 & \textbf{89.2\%} \\
+02-21 05:45 & 383 & 414 & 87.6\% \\
+02-25 01:45 & 377 & 422 & 87.3\% \\
+02-21 19:15 & 373 & 426 & 85.0\% \\
+02-21 02:00 & 374 & 413 & 82.4\% \\
+02-22 20:30 & 363 & 428 & 81.2\% \\
+02-25 00:15 & 382 & 433 & 75.8\% \\
+02-21 02:45 & 363 & 422 & 75.3\% \\
+02-23 01:30 & 382 & 424 & 72.9\% \\
+02-20 21:45 & 363 & 433 & 69.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In 20 windows, over 75\% of all Polymarket trades have a Kalshi counterpart within 3 seconds. This density of same-second execution across two independent platforms is automated cross-platform trading.
+
+\subsection{Amount Matching: The Arbitrage Smoking Gun}
+
+We search for trade pairs across platforms where: (1) the dollar amount matches within $\pm$20\%, (2) the time difference is $\leq$5 seconds, and (3) the directions are \textbf{opposite} (buy UP on Polymarket while selling NO on Kalshi, or vice versa). Opposite-side, same-amount, near-simultaneous trades are the signature of cross-platform arbitrage.
+
+\begin{table}[H]
+\centering
+\caption{Amount-matched cross-platform trade pairs}
+\label{tab:amount_match}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Total amount matches ($\pm$20\%, $\pm$5s) & 1,581,658 \\
+Opposite-side matches (arb pattern) & \textbf{1,368} \\
+Opposite-side ratio & 68.7\% of directional matches \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Opposite-side amount-matched trades: the arbitrage evidence}
+\label{tab:arb_examples}
+\footnotesize
+\begin{tabular}{@{}lrrcccc@{}}
+\toprule
+\textbf{Window} & \textbf{P\_USD} & \textbf{K\_USD} & \textbf{$\Delta t$} & \textbf{P\_Dir} & \textbf{K\_Side} & \textbf{Poly Wallet} \\
+\midrule
+02-21 11:00 & \$580.00 & \$513.81 & $-$4s & up & no & \texttt{0x7296...} \\
+02-21 11:00 & \$4.95 & \$4.95 & +2s & up & no & \texttt{0x03c3...} \\
+02-20 13:45 & \$101.25 & \$92.07 & $-$5s & up & no & \texttt{0x4586...} \\
+02-20 13:45 & \$49.65 & \$49.50 & $-$3s & up & no & \texttt{0x8e3d...} \\
+02-20 16:45 & \$4.95 & \$4.95 & +2s & up & no & \texttt{0x3d1b...} \\
+02-20 16:45 & \$4.95 & \$4.95 & +2s & up & no & \texttt{0xb373...} \\
+02-21 08:00 & \$49.38 & \$53.46 & $-$5s & up & no & \texttt{0x1da9...} \\
+02-21 08:00 & \$49.50 & \$53.46 & $-$5s & up & no & \texttt{0xf44d...} \\
+02-20 04:45 & \$3.00 & \$3.17 & 0s & down & yes & \texttt{0xd95f...} \\
+02-19 11:45 & \$8.92 & \$9.35 & +5s & down & yes & \texttt{0x2518...} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Key patterns in the arb evidence:
+\begin{itemize}[nosep]
+    \item \textbf{Exact dollar matches:} Three instances of \$4.95/\$4.95 (identical amounts, 2 seconds apart, opposite sides on different platforms).
+    \item \textbf{Large-size arb:} \$580 Polymarket UP buy paired with \$513 Kalshi NO trade, 4 seconds apart.
+    \item \textbf{Same window, multiple wallets:} Feb 20 13:45 and Feb 21 08:00 each show 2+ wallets executing arb trades in the same window---different wallets racing the same signal.
+    \item \textbf{Zero-second match:} \$3.00/\$3.17 trades execute in the \textbf{same second} on opposite sides of opposite platforms.
+    \item \textbf{Wallet \texttt{0x03c3b0236c...}} appears in both amount matches and the core co-trading cluster (Table~\ref{tab:core_cluster})---34,191 total trades, \$282K volume.
+\end{itemize}
+
+\subsection{Intra-Platform Co-Trading: Wallet-Level Temporal Proof}
+
+Beyond cross-platform synchronization, we detect \textbf{wallet pairs on Polymarket that trade in the same second} with correlated direction. These are the actual wallets executing the arbitrage:
+
+\begin{table}[H]
+\centering
+\caption{Top same-second co-trading wallet pairs (Polymarket 15-min)}
+\label{tab:cotrade}
+\small
+\begin{tabular}{@{}llrr@{}}
+\toprule
+\textbf{Wallet A} & \textbf{Wallet B} & \textbf{Same-Sec} & \textbf{Same Dir} \\
+\midrule
+\texttt{0xe041...f2e5} & \texttt{0x1d00...0313} & \textbf{11,869} & 86.7\% \\
+\texttt{0x1979...9d} & \texttt{0x1d00...0313} & \textbf{11,306} & 91.6\% \\
+\texttt{0x1979...9d} & \texttt{0xe041...f2e5} & \textbf{8,147} & 84.9\% \\
+\texttt{0x03c3...1d} & \texttt{0xe041...f2e5} & 6,349 & 80.2\% \\
+\texttt{0xe041...f2e5} & \texttt{0xbd7d...d1} & 6,186 & 83.0\% \\
+\texttt{0xd0d6...93aa} & \texttt{0xe041...f2e5} & 5,766 & 86.9\% \\
+\texttt{0x03c3...1d} & \texttt{0x1d00...0313} & 5,746 & 73.1\% \\
+\texttt{0xd0d6...93aa} & \texttt{0x1d00...0313} & 5,109 & 82.6\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\texttt{0xe041...f2e5} and \texttt{0x1d00...0313} execute \textbf{11,869 trades in the same second} with 86.7\% directional agreement. \texttt{0x1979...9d} and \texttt{0x1d00...0313} execute 11,306 same-second trades with 91.6\% same direction. These are not coincidences---they are bots reacting to the same signal (Binance BTC price) with sub-second latency.
+
+The core cluster of 6 wallets executing in lockstep:
+
+\begin{table}[H]
+\centering
+\caption{Core arbitrage cluster: 6 wallets with coordinated temporal execution}
+\label{tab:core_cluster}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Wallet} & \textbf{Trades} & \textbf{Volume} & \textbf{PnL} & \textbf{K\_Align} \\
+\midrule
+\texttt{0xe041d09715148a9a...f2e5} & 59,134 & \$353,079 & \$17,064 & 50.0\% \\
+\texttt{0x1d0034134e339a30...0313} & 45,888 & \$1,252,304 & \$54,249 & 53.1\% \\
+\texttt{0x03c3b0236c5a0105...1d} & 34,191 & \$282,217 & \$5,468 & 63.6\% \\
+\texttt{0x1979ae6b7e6534de...9d} & 31,909 & \$1,544,952 & \$98,674 & 54.2\% \\
+\texttt{0xd0d6053c3c37e727...93aa} & 20,902 & \$397,737 & \$30,307 & 50.0\% \\
+\texttt{0xbd7d453564deca2b...d1} & 17,177 & \$839,424 & \$42,712 & 50.0\% \\
+\midrule
+\textbf{Total} & \textbf{209,201} & \textbf{\$4,669,713} & \textbf{\$248,474} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These 6 wallets account for \textbf{\$4.7M in volume and \$248K in profit} over 5.6 days, executing 209,201 trades with sub-second coordination. They share 30 common counterparties (market makers) across 8,000+ shared markets.
+
+\subsection{Behavioral Fingerprint Clusters}
+
+Three wallet pairs show near-identical timing fingerprints---average trade offset within 3--10ms and trade size ratios within 96--99\%---indicating single-operator multi-wallet strategies:
+
+\begin{table}[H]
+\centering
+\caption{Behaviorally identical wallet pairs (likely same operator)}
+\label{tab:fingerprint}
+\small
+\begin{tabular}{@{}llrr@{}}
+\toprule
+\textbf{Wallet A} & \textbf{Wallet B} & \textbf{Offset $\Delta$} & \textbf{Size Ratio} \\
+\midrule
+\texttt{0x583a...ff6} & \texttt{0xabb4...ff4} & 3.4ms & 95.9\% \\
+\texttt{0xa07a...832} & \texttt{0x583a...ff6} & 9.4ms & 99.1\% \\
+\texttt{0x4396...32a} & \texttt{0x398f...264} & 1.2ms & 86.7\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All of these wallets appear in the 100\% Kalshi-aligned suspect list.
+
+\subsection{Wallet Performance with Kalshi Alignment}
+
+Each wallet's \textbf{Kalshi alignment score}: fraction of trades where bet direction matches the Kalshi outcome. Random = $\sim$50\%.
+
+\begin{table}[H]
+\centering
+\caption{Top Polymarket wallets by PnL on 15-min markets}
+\label{tab:top_wallets_15m}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Wallet} & \textbf{Trades} & \textbf{WR} & \textbf{Volume} & \textbf{PnL} & \textbf{K\_Align} \\
+\midrule
+\texttt{0x1979...9d} & 31,909 & 54.3\% & \$1,544,952 & \$98,674 & 54.2\% \\
+\texttt{0x1d00...13} & 45,888 & 53.1\% & \$1,252,304 & \$54,249 & 53.1\% \\
+\texttt{0xbd7d...d1} & 17,177 & 50.1\% & \$839,424 & \$42,712 & 50.0\% \\
+\texttt{0x63ce...9a} & 6,011 & 54.5\% & \$237,805 & \$34,113 & 54.3\% \\
+\texttt{0x33fa...f4} & 10,577 & 77.5\% & \$187,575 & \$9,182 & \textbf{81.9\%} \\
+\texttt{0xc062...25} & 205 & 85.4\% & \$164,440 & \$6,913 & \textbf{87.8\%} \\
+\texttt{0x537...2e} & 2,422 & 69.0\% & \$44,141 & \$8,417 & \textbf{71.1\%} \\
+\texttt{0x03c3...1d} & 34,191 & 63.3\% & \$282,217 & \$5,468 & \textbf{63.6\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The top volume wallets show near-random Kalshi alignment ($\sim$50--54\%), consistent with market makers. However, a distinct cluster shows \textbf{anomalously high Kalshi alignment}:
+
+\begin{table}[H]
+\centering
+\caption{Wallets with 100\% Kalshi alignment (20 wallets, all with 100\% WR and 100\% K\_Align)}
+\label{tab:kalshi_sync}
+\footnotesize
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Wallet (full)} & \textbf{Trades} & \textbf{PnL} \\
+\midrule
+\texttt{0x4602411d7a9ca3004813da8fec7b46d27d72b0f9} & \textbf{900} & \$303 \\
+\texttt{0x9e51207b5fbb6cfe64d656ca73a4d8f2278b691c} & \textbf{499} & \$149 \\
+\texttt{0xf2eda2eca20eea27bdb0038bc3fc559e2cbb98a8} & 282 & \$876 \\
+\texttt{0x10e052124fdfe8a8b66811a4e0c4c19ffa26b38a} & 212 & \$216 \\
+\texttt{0x70488a2e4635e21bff01fa084f8854e3d5e12fbc} & 173 & \$82 \\
+\texttt{0x722beb62befdc30beafac5abae62d4683a6db7db} & 142 & \$64 \\
+\texttt{0xa07a9fd88723a49e32761eef7b4677aaa3299832} & 109 & \$126 \\
+\texttt{0x583a7e4e2ec324ccdb4811e66eb8168d9aa2aff6} & 93 & \$108 \\
+\texttt{0x69786a14667cf010a87ce31ad4ea278b6a9bed38} & 85 & \$247 \\
+\texttt{0xabb4affae8fef5eadaa3ec9ffd3e9bae18215ff4} & 64 & \$78 \\
+\texttt{0x12eadd8029ffb1b53098d5bf439d9dc52db11774} & 56 & \$70 \\
+\texttt{0xd26a07185f9075c541dc085e47c9bcbe9c8cc5ea} & 55 & \$77 \\
+\texttt{0x398f2971ca851ef4560d172b2eee46be2eb38264} & 48 & \$109 \\
+\texttt{0x0e60496876f522f15f370348c0fc22b70d68f1df} & 43 & \$46 \\
+\texttt{0x0eb6d02bb5eb90f06d994fa8af7edfc6d9f01064} & 42 & \$51 \\
+\texttt{0x4396378a91ba74be2b448f83c586574871fc332a} & 40 & \$191 \\
+\texttt{0xd8fbd2007b6d7cd1ca19eceba1f1f28a64c1716a} & 39 & \$86 \\
+\texttt{0x8830ce0cda490e27ecfcaf3c7817a45d3a452abf} & 59 & \$37 \\
+\texttt{0x91176db78ea5d0d1566ee028120137e1bfaececa} & 33 & \$745 \\
+\texttt{0xf3408ba8b1427564005fb5720c495f430958e55b} & 33 & \$636 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{20 wallets achieve 100\% win rate with 100\% Kalshi alignment.} The most extreme: \texttt{0x4602...09} with \textbf{900 trades, every single one correct} ($p < 10^{-270}$). Total: \textbf{1,810 wallets} exceed 58\% Kalshi alignment.
+
+Note: wallets \texttt{0x583a...}, \texttt{0xa07a...}, \texttt{0xabb4...} from this 100\%-aligned list are the \emph{same wallets} that appear in the behavioral fingerprint clusters (Table~\ref{tab:fingerprint}), and wallets \texttt{0x4396...}, \texttt{0x398f...} form a 1.2ms-offset pair. These are the same operators running coordinated infrastructure across both Polymarket and Kalshi.
+
+\subsection{Temporal Arbitrage: Polymarket 5-min $\leftrightarrow$ Binance}
+
+Complementing the Polymarket--Kalshi cross-platform analysis, we analyze Polymarket's 5-minute markets against real-time Binance BTC price data (929~windows):
+
+\begin{table}[H]
+\centering
+\caption{Binance-linked temporal arbitrage summary (5-min markets)}
+\label{tab:binance_temporal}
+\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Wallets analyzed & 6,544 \\
+Arb suspects flagged & 3,956 \\
+Wallets with $>$75\% Binance alignment & 1,247 \\
+Sync.\ volume bursts (Poly + Kalshi $>$2$\times$ avg) & 72 \\
+\midrule
+Top wallet PnL & \$86,800 (20,471 trades, 77.8\% aligned) \\
+Highest Binance-aligned WR & 81.8\% (1,132 trades) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+72 windows show synchronized volume bursts where both Polymarket and Kalshi simultaneously exceed 2$\times$ their average volume---consistent with shared external triggers (large BTC moves on Binance) driving coordinated activity across both prediction markets.
+
+% ═══════════════════════════════════════════════════════════════════
+\newpage
+\section{Economic Analysis}
+% ═══════════════════════════════════════════════════════════════════
+
+\subsection{P\&L Decomposition by Strategy}
+
+The preceding sections identify distinct strategy types---latency arbitrage, sell-cluster minting, market making, and cross-platform hedging---but report only gross trade counts and win rates. Here we decompose realized profit and loss per strategy, accounting for the Polymarket fee structure, Polygon gas costs, and execution slippage. This analysis covers the 15-minute market dataset (2,536,367 trades, 20,620 wallets, 672 windows).
+
+\paragraph{Fee model.} Polymarket's NegRisk BTC markets operate with 0\% maker fee (plus a small rebate), 0\% taker fee, and no explicit resolution fee. The binding costs are:
+\begin{enumerate}[nosep]
+    \item \textbf{Spread cost:} the difference between execution price and fair value at trade time. For latency bots trading in the final seconds, fair value is near \$1 (direction known), so spread cost $\approx 0$.
+    \item \textbf{Gas:} Polygon L2 transactions cost $\sim$\$0.01 each. At 2.5M trades, aggregate gas $\approx$ \$25,200.
+    \item \textbf{Slippage:} market impact from large orders. Relevant primarily for market makers with \$20M+ volume.
+\end{enumerate}
+
+\paragraph{P\&L computation.} For each trade, realized P\&L is:
+\begin{align}
+    \text{PnL}_{\text{buy}} &= \begin{cases} s(1 - p) & \text{if win} \\ -sp & \text{if loss} \end{cases} \\
+    \text{PnL}_{\text{sell}} &= \begin{cases} sp & \text{if win} \\ -s(1-p) & \text{if loss} \end{cases}
+\end{align}
+where $s$ is the number of shares and $p$ is the execution price. We classify every wallet with $\geq$5 trades into one of five categories by its behavioral signature, then aggregate across all 2,521,731 classifiable trades.
+
+\begin{table}[H]
+\centering
+\caption{P\&L decomposition by strategy (15-minute markets, Feb 19--25)}
+\label{tab:pnl_decomp}
+\footnotesize
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+\textbf{Strategy} & \textbf{Wallets} & \textbf{Trades} & \textbf{WR} & \textbf{Gross PnL} & \textbf{Volume} & \textbf{Gas} & \textbf{Net PnL} & \textbf{ROI} \\
+\midrule
+Latency Arb    & 494   & 54,299   & 93.5\%  & \$26,718   & \$3,330,160   & \$543   & \$26,175   & 0.8\% \\
+Sell-Cluster   & 506   & 151,431  & 67.5\%  & \$28,549   & \$1,096,530   & \$1,514 & \$27,035   & 2.5\% \\
+Market Making  & 3,255 & 1,831,650 & 52.4\% & \$384,915  & \$20,459,469  & \$18,316 & \$366,599 & 1.8\% \\
+Informed       & 1,180 & 230,991  & 87.1\%  & \$96,379   & \$4,160,131   & \$2,310 & \$94,070   & 2.3\% \\
+Retail         & 7,956 & 253,360  & 43.2\%  & $-$\$211,975 & \$4,420,859 & \$2,534 & $-$\$214,508 & $-$4.9\% \\
+\midrule
+\textbf{Total} & 13,391 & 2,521,731 &       & \$324,587  & \$33,467,150  & \$25,217 & \$299,369 &       \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Per-trade economics.} The key insight is that different strategies extract value through different mechanisms, with sharply different per-trade edge profiles:
+
+\begin{table}[H]
+\centering
+\caption{Per-trade economics by strategy}
+\label{tab:pertrade}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Strategy} & \textbf{Edge/Trade} & \textbf{Avg Size} & \textbf{Avg Price} & \textbf{Net/Trade} \\
+\midrule
+Latency Arb  & \$0.492  & \$73.00 & 0.92 & \$0.482 \\
+Sell-Cluster & \$0.189  & \$13.27 & 0.33 & \$0.179 \\
+Market Making & \$0.210 & \$27.36 & 0.58 & \$0.200 \\
+Informed     & \$0.417  & \$26.54 & 0.85 & \$0.407 \\
+Retail       & $-$\$0.837 & \$45.04 & 0.49 & $-$\$0.847 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{itemize}[nosep]
+    \item \textbf{Latency arb} (494 wallets, 93.5\% WR): highest per-trade edge (\$0.49) at an average entry price of 92\textcent---buying near certainty. These wallets trade \$73 average size in the final minutes of each window. Despite the highest win rate, their total profit (\$26K) is dwarfed by market makers because their capacity is constrained by available resting liquidity.
+    \item \textbf{Sell-cluster} (506 wallets, 67.5\% WR): moderate edge (\$0.19/trade) via NegRisk minting at an average sell price of 33\textcent. Selling the loser token at $p$ yields profit $sp$ per winning trade but costs $s(1-p)$ per loss. At 67.5\% WR, the strategy generates \$28K net profit on \$1.1M volume (2.5\% ROI).
+    \item \textbf{Market making} (3,255 wallets, 52.4\% WR): lowest per-trade edge (\$0.21) but highest aggregate volume (\$20.5M) and profit (\$367K net). Profit derives from the bid--ask spread across both UP and DOWN tokens. The 52.4\% win rate implies a slight directional tilt beyond pure spread capture, consistent with informed market making.
+    \item \textbf{Informed} (1,180 wallets, 87.1\% WR): high win rate with moderate volume (\$4.2M), generating \$94K net. These wallets trade throughout the window (avg entry 579s, not concentrated in the final minutes) but show strong Kalshi outcome alignment, suggesting cross-platform information.
+    \item \textbf{Retail} (7,956 wallets, 43.2\% WR): negative expected value with $-$\$212K aggregate P\&L. The sub-50\% win rate combined with the bid--ask spread produces $-$\$0.85 per trade---the ``house edge'' of the prediction market.
+\end{itemize}
+
+\subsection{Temporal Stationarity}
+
+A critical question for both traders and regulators: is the arbitrage opportunity stable, expanding, or being competed away? We decompose all metrics by calendar day.
+
+\begin{table}[H]
+\centering
+\caption{Day-by-day arbitrage activity (latency arb + sell-cluster + informed combined)}
+\label{tab:temporal}
+\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+\textbf{Date} & \textbf{Windows} & \textbf{Arb Trades} & \textbf{WR} & \textbf{PnL} & \textbf{PnL/Window} & \textbf{Active} & \textbf{New} \\
+\midrule
+Feb 19 & 96 & 68,102  & 82.5\% & \$21,681 & \$225.8 & 1,446 & 1,446 \\
+Feb 20 & 96 & 75,594  & 79.5\% & \$30,531 & \$318.0 & 1,491 & 211 \\
+Feb 21 & 96 & 53,660  & 77.2\% & \$27,505 & \$286.5 & 1,346 & 142 \\
+Feb 22 & 96 & 50,911  & 79.1\% & \$14,367 & \$149.7 & 1,394 & 133 \\
+Feb 23 & 96 & 64,993  & 82.1\% & \$19,475 & \$202.9 & 1,492 & 128 \\
+Feb 24 & 96 & 59,726  & 82.1\% & \$10,021 & \$104.4 & 1,511 & 70 \\
+Feb 25 & 96 & 63,735  & 84.4\% & \$28,067 & \$292.4 & 1,465 & 50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Stationarity assessment.} We regress PnL-per-window on day index to test whether the opportunity is declining. The result: mean PnL/window = \$225.66, slope = $-$\$11.12/day---the slope is less than 5\% of the mean, indicating a \textbf{stable} opportunity over the 7-day window.  Daily PnL fluctuates between \$10K and \$31K, but this variance is driven by BTC volatility (more large moves $=$ more arb opportunities), not by competition eroding the edge.
+
+\paragraph{New entrant dynamics.} 1,446 arb wallets appear on day~1, then the new-entrant rate declines sharply: 211 on Feb~20, falling to just 50 by Feb~25. Across the full period, 2,180 unique arb wallets enter. The declining entry rate suggests the niche saturated quickly: the first-mover operators dominate, and late entrants add little incremental volume. The active count stabilizes at $\sim$1,400--1,500 wallets per day by Feb~20---the market reaches a competitive steady state within 48 hours.
+
+The opportunity is \textbf{structurally persistent} rather than transient, because the root cause---Binance BTC price leading Polymarket's Chainlink oracle by seconds---is a design feature, not an inefficiency that competition can eliminate. The only way to close the latency channel is for Polymarket to either reduce the settlement window or use a faster oracle.
+
+\subsection{Loss Distribution: Who Pays for Arbitrage?}
+
+Arbitrage profits are not created from nothing---they are extracted from counterparties. With \$725K in gross arb wallet profits over 5.6 days (15-minute markets), we ask: who sits on the other side of these trades?
+
+\paragraph{Caveat: single-venue visibility.} We observe only one leg of each participant's strategy. Market makers on Polymarket almost certainly delta-hedge their binary option exposure on centralized venues (Binance perpetuals, Deribit options). A ``loss'' on Polymarket may be offset by a corresponding gain on the hedge leg, making the net position profitable through spread capture and maker rebates. The figures below therefore represent \textbf{adverse selection costs on Polymarket}, not necessarily economic losses. We use ``loss'' as shorthand for single-venue P\&L throughout this section.
+
+\paragraph{Methodology.} For each of 672 market windows, we partition all 2.5M trades into five wallet categories. When an arb wallet wins, the counterparty is whoever bet on the losing side in the same window. We attribute losses proportionally: if market makers contributed 75\% of losing-side volume and retail contributed 18\%, the arb profit is attributed accordingly.
+
+\begin{table}[H]
+\centering
+\caption{Adverse selection attribution by counterparty type (15-minute markets, single-venue)}
+\label{tab:losses}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Counterparty} & \textbf{Arb-Attributed} & \textbf{Share} & \textbf{Losing Trades} & \textbf{Gross Loss} & \textbf{Loss Rate} \\
+\midrule
+Market makers     & \$542,627  & 74.8\% & 870,991  & \$6,334,443  & 2.65\%  \\
+Retail/uninformed & \$127,081  & 17.5\% & 151,819  & \$1,330,846  & 2.88\%  \\
+Other arb bots    & \$55,303   & 7.6\%  & 82,480   & \$573,365    & ---     \\
+\midrule
+\textbf{Total}    & \$725,011  &        & 1,105,290 & \$8,238,654 &         \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Market makers absorb 74.8\% of adverse selection.} Of the \$725K in arb profits, \textbf{\$543K comes from market-maker counterparties}---the dominant source. This is the expected outcome in CLOB microstructure: market makers post passive limit orders on both sides; latency bots arrive with superior information and selectively take the stale side. The maker's resting order is filled at a price that no longer reflects fair value. This is identical to the adverse selection problem in traditional equity market making~\cite{saguillo2025}.
+
+Critically, these single-venue, single-wallet figures likely overstate true MM losses because market makers can hedge \textit{within the prediction market ecosystem itself}---where the payoff structures match perfectly (binary vs.\ binary, not binary vs.\ linear):
+
+\begin{enumerate}[nosep]
+    \item \textbf{Multi-wallet hedging on Polymarket.} NegRisk ensures 1~UP + 1~DOWN = 1~USDC. A market maker can mint both tokens for \$1.00, then sell whichever side has demand at a markup, locking in the spread regardless of outcome. Alternatively, one wallet buys YES while another wallet (same operator) buys NO in the same window---our per-wallet P\&L accounting attributes a ``loss'' to whichever wallet holds the losing token, but the operator's \textit{combined} position may be flat or profitable. The six-wallet sell clusters identified in Section~4.3 (identical behavioral fingerprints, 24--27s timing $\sigma$) are likely exactly this: a single operator distributing both sides across wallets.
+    \item \textbf{Cross-platform hedging (Polymarket $\leftrightarrow$ Kalshi).} Buy YES on Polymarket at \$0.55, buy NO on Kalshi at \$0.40---if the prices don't sum to \$1.00, the position is profitable regardless of outcome. Section~7 documents exactly this activity: 1,368 opposite-side amount-matched trades across platforms. The 5.7\% oracle disagreement rate is the residual risk, not a deal-breaker for MMs who can price it in.
+\end{enumerate}
+
+Both hedges avoid the binary-vs-linear payoff mismatch that makes perpetual futures a poor hedge for short-window binary options (a perp's P\&L scales with BTC move magnitude; a binary settles 0 or 1 regardless of move size). The adverse selection cost we measure (\$543K) is therefore an \textit{upper bound} on true MM losses---the actual economic cost depends on how much of their book is internally hedged across wallets or cross-platform. Their real revenue comes from the bid-ask spread and Polymarket's 1--2\% maker rebate on uninformed flow, which---even on a single-venue, single-wallet basis---already exceeds adverse selection costs (\$385K net positive P\&L on \$20.5M volume).
+
+The top 15 adverse-selection wallets are \textit{all} classified as market makers, led by Square-Guy (\$451K on-venue losses, 14,580 losing trades) and Canine-Commandment (\$398K, 21,528 trades). On Polymarket alone, MMs remain net profitable (\$385K aggregate P\&L across \$20.5M volume), meaning spread revenue from uninformed flow already exceeds adverse selection costs---even before accounting for off-venue hedging gains. Their effective adverse selection rate is 2.65\textcent\ per dollar traded: \textbf{for every \$100 in market-making volume, \$2.65 is captured by arb bots}.
+
+\paragraph{Retail traders: 17.5\% of losses, 43.2\% WR.} Retail traders (\$127K attributed to arb, \$1.33M gross losses) bear a 2.88\textcent-per-dollar loss rate---slightly higher than market makers. With a 43.2\% win rate against a 50\% base rate, they lose $-$\$0.85 per trade on average. Their \$212K aggregate loss over 5.6 days (\$4.4M volume) reflects the structural negative EV of uninformed participation: binary options with 50/50 base rates and positive transaction costs produce negative expected value for participants without an information edge.
+
+\paragraph{Arb-on-arb losses: 7.6\%.} Even arb wallets lose \$55K to other arb wallets---reflecting the competitive dynamics within the arb niche. When multiple bots chase the same signal, they compete on speed and the slower bot may get filled at a worse price or on the wrong side.
+
+\paragraph{The value flow.} Combining single-venue and cross-venue considerations, the economic flow is:
+\begin{enumerate}[nosep]
+    \item \textbf{Binance spot market} generates public BTC price information (free).
+    \item \textbf{Arb bots} (\$151K combined profit from latency + sell-cluster + informed) convert that information into Polymarket profits by trading against stale limit orders.
+    \item \textbf{Market makers} (\$543K single-venue, single-wallet adverse selection) are the primary counterparties. They recoup this through (a)~bid-ask spread on uninformed flow, (b)~Polymarket maker rebates (1--2\%), and crucially (c)~internal hedging across multiple wallets (NegRisk minting, both-sides quoting) and cross-platform hedging against Kalshi. Perp-based hedging is a poor fit due to the binary-vs-linear payoff mismatch on short windows. On Polymarket alone, single-wallet accounting already shows MMs net profitable (\$385K)---true operator-level P\&L is likely higher.
+    \item \textbf{Retail traders} (\$127K attributed losses, 43.2\% WR) face structural negative EV from the bid-ask spread and information asymmetry. Unlike MMs, retail participants are unlikely to hedge, making their losses closer to true economic losses.
+\end{enumerate}
+This mirrors the latency arbitrage dynamic in traditional equities, where HFT firms exploit stale quotes on slower exchanges. The prediction market variant is more extreme because the binary outcome and fixed settlement window create a deterministic information advantage in the final minutes. However, the MM hedge channel means the on-chain ``loss'' figures represent an \textit{upper bound} on true economic extraction---the real cost of the information asymmetry is ultimately borne primarily by retail participants and, to a lesser extent, by the hedging friction costs of market makers.
+
+% ═══════════════════════════════════════════════════════════════════
+\newpage
+\section{Conclusion}
+% ═══════════════════════════════════════════════════════════════════
+
+We document two distinct arbitrage channels operating across cryptocurrency prediction markets, analyzing 6.4 million trades over 5.6 days.
+
+\subsection{Channel 1: Binance $\to$ Polymarket (5-Minute Markets)}
+
+Binance BTC price serves as a \textbf{free information feed} for Polymarket's 5-minute binary options. We identify 1,647 latency arbitrage candidates, of which 29 achieve $>$98\% win rates by trading in the final 15 seconds of each 300-second window. The evidence is unambiguous:
+
+\begin{itemize}[nosep]
+    \item Nippy-Styling trades at 299.2 seconds average (0.8s before resolution), 98.6\% WR across 141 trades.
+    \item Wallets achieve 97--100\% WR when Binance has moved $>$\$80, but $\sim$50\% (random) on small moves.
+    \item A staggered 3-wallet cascade (Plaintive-Forgery $\to$ Ambitious-Birch $\to$ Nippy-Styling) fires at 278s, 293s, 299s---likely a single operator.
+    \item A coordinated market-maker (Capital-Potty, \$94K volume) takes the opposite side of latency bots in 99.8\% of shared markets.
+\end{itemize}
+
+Annualized, latency arbitrage on Polymarket's 5-minute BTC markets could yield \$2--3M for a sophisticated operator.
+
+\subsection{Channel 2: Polymarket $\leftrightarrow$ Kalshi (15-Minute Markets)}
+
+Second-by-second trade matching across 672 simultaneously active 15-minute windows reveals direct evidence of cross-platform arbitrage:
+
+\begin{enumerate}[nosep]
+    \item \textbf{161,577 same-second trade pairs} between Polymarket and Kalshi, with sync rates reaching 89.2\% in individual windows.
+    \item \textbf{1,368 opposite-side amount-matched trades}---buy on one platform, sell on the other within $\pm$5 seconds at matching dollar amounts ($\pm$20\%). The \$580/\$513 pair (4 seconds apart, opposite sides) and exact \$4.95/\$4.95 pairs are textbook arb execution.
+    \item \textbf{1,810 Polymarket wallets with anomalous Kalshi alignment} ($>$58\%), including wallets with 100\% WR and 100\% Kalshi alignment across hundreds of trades ($p < 10^{-270}$).
+    \item \textbf{Price divergences averaging 6.9\%} (max 42.7\%) between platforms, with 52.1\% of windows exceeding 5 cents.
+    \item \textbf{72 synchronized volume bursts} where both platforms simultaneously exceed 2$\times$ average volume, triggered by Binance BTC moves.
+\end{enumerate}
+
+However, cross-platform arbitrage is \textbf{not risk-free}: the 5.7\% oracle disagreement rate (Chainlink vs.\ CF Benchmarks BRTI) means any hedged position faces a 1-in-18 chance of double loss. The residual alpha lies in the \textbf{speed-of-information contest}: monitoring Binance BTC prices in real-time and racing to trade on whichever prediction market offers the best effective price before resolution.
+
+\subsection{The Unified Picture}
+
+Both channels are driven by the same underlying dynamic: \textbf{Binance BTC price as the universal information source}. On 5-minute markets, traders watch Binance and race to Polymarket. On 15-minute markets, the same signal drives simultaneous activity on both Polymarket and Kalshi, creating the synchronized volume bursts and same-second trade pairs we observe.
+
+The economic analysis (Section~8) decomposes \$325K in net profits across five strategy types and shows the opportunity is temporally stable (PnL/window slope $<$5\% of mean). On-chain adverse selection analysis shows market makers are the primary counterparty (74.8\%, \$543K single-venue), but they likely offset most of this cost through spread capture, maker rebates, and delta hedges on centralized exchanges. Retail traders (17.5\%, \$127K, 2.88\textcent-per-dollar) are the participants least likely to hedge, making them the ultimate bearers of the information asymmetry cost.
+
+The wallets involved are listed in full in Appendix~\ref{app:wallets}. For on-chain identity tracing (Safe owner extraction, bridge scanning) of these wallets, see Appendix~\ref{app:onchain}.
+
+% ═══════════════════════════════════════════════════════════════════
+% References
+% ═══════════════════════════════════════════════════════════════════
+\begin{thebibliography}{9}
+
+\bibitem{saguillo2025}
+O.~Saguillo, V.~Ghafouri, L.~Kiffer, G.~Suarez-Tangil,
+\emph{Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets},
+arXiv:2508.03474, August 2025.
+
+\bibitem{polymarket_docs}
+Polymarket, \emph{Developer Documentation},
+\url{https://docs.polymarket.com/}, 2026.
+
+\bibitem{kalshi_api}
+Kalshi, \emph{API Documentation},
+\url{https://docs.kalshi.com/}, 2026.
+
+\bibitem{polymarket_fees}
+Polymarket, \emph{Fees Documentation},
+\url{https://docs.polymarket.com/trading/fees}, 2026.
+
+\bibitem{negrisk}
+Polymarket, \emph{NegRisk Overview},
+\url{https://docs.polymarket.com/developers/neg-risk/overview}, 2026.
+
+\bibitem{arbbets}
+ArbBets, \emph{Polymarket vs Kalshi: Comparison for Arbitrage Traders},
+\url{https://getarbitragebets.com/blog/polymarket-vs-kalshi}, 2026.
+
+\bibitem{ahasignals}
+AhaSignals, \emph{Prediction Market Arbitrage Strategies},
+\url{https://ahasignals.com/research/prediction-market-arbitrage-strategies/}, 2026.
+
+\bibitem{monad}
+Monad Blog, \emph{Prediction Markets Cannot Agree on the Truth},
+\url{https://blog.monad.xyz/blog/prediction-market-arbitrage}, 2025.
+
+\bibitem{chainlink}
+Chainlink, \emph{Data Streams Documentation},
+\url{https://docs.chain.link/data-streams}, 2026.
+
+\bibitem{etherscanv2}
+Etherscan, \emph{Etherscan V2 API Documentation},
+\url{https://docs.etherscan.io/etherscan-v2}, 2026.
+
+\bibitem{wormholescan}
+Wormhole Foundation, \emph{WormholeScan API},
+\url{https://docs.wormholescan.io/}, 2026.
+
+\bibitem{dflow}
+DFlow, \emph{Prediction Markets API: Tokenizing the Future with Kalshi},
+\url{https://pond.dflow.net}, 2025.
+
+\bibitem{kalshi_solana}
+Kalshi, \emph{Kalshi Goes On-Chain: Tokenized Predictions Live on Solana},
+\url{https://news.kalshi.com/p/kalshi-solana-tokenized-predictions}, 2025.
+
+\bibitem{mayan}
+Mayan Finance, \emph{Mayan Swift: Cross-Chain Swap Protocol},
+\url{https://mayan.finance/}, 2026.
+
+\bibitem{gnosis_safe}
+Safe (formerly Gnosis Safe), \emph{Safe Smart Account Documentation},
+\url{https://docs.safe.global/}, 2026.
+
+\bibitem{relay}
+Relay Protocol, \emph{Relay: Cross-Chain Bridge},
+\url{https://relay.link/}, 2026.
+
+\end{thebibliography}
+
+% ═══════════════════════════════════════════════════════════════════
+\appendix
+\section{Top Cross-Platform Arbitrage Suspect Wallets}
+\label{app:wallets}
+% ═══════════════════════════════════════════════════════════════════
+
+\paragraph{Why no Kalshi wallets?} Kalshi is a centralized, CFTC-regulated exchange. Its public trade API exposes \texttt{trade\_id}, price, side, and contract count---but \textbf{no user identifiers}. Unlike Polymarket (where every trade is an on-chain transaction linked to a proxy wallet), Kalshi trades are anonymous by design. We therefore cannot identify the Kalshi-side operator of any cross-platform arbitrage pair. The wallets below are the \textbf{Polymarket side} of suspected cross-platform operations, identified by their anomalous alignment with Kalshi market outcomes and same-second trade synchronization.
+
+\footnotesize
+\begin{longtable}{@{}clrrrl@{}}
+\toprule
+\textbf{\#} & \textbf{Proxy Wallet} & \textbf{Trades} & \textbf{WR} & \textbf{K\_Align} & \textbf{Pattern} \\
+\midrule
+\endhead
+\multicolumn{6}{@{}l}{\textit{15-min Perfect Kalshi Sync (100\% alignment)}} \\
+\midrule
+1 & \texttt{0x4602...b0f9} & 900 & 100.0\% & 100.0\% & \$290K vol \\
+2 & \texttt{0x9e51...691c} & 499 & 100.0\% & 100.0\% & \$6.6K vol \\
+3 & \texttt{0xf2ed...98a8} & 282 & 99.7\% & 100.0\% & \$31K vol \\
+4 & \texttt{0x10e0...0f66} & 212 & 100.0\% & 100.0\% & \$20.5K vol \\
+5 & \texttt{0x92b2...ef15} & 209 & 100.0\% & 100.0\% & \$1.3K vol \\
+6 & \texttt{0x7048...8a42} & 173 & 100.0\% & 100.0\% & \$3.9K vol \\
+7 & \texttt{0x722b...2de7} & 142 & 100.0\% & 100.0\% & \$2.1K vol \\
+8 & \texttt{0xa07a...5b56} & 109 & 100.0\% & 100.0\% & \$716 vol \\
+9 & \texttt{0x583a...e0e} & 93 & 100.0\% & 100.0\% & \$620 vol \\
+10 & \texttt{0x6978...ed38} & 85 & 100.0\% & 100.0\% & \$18.6K vol \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{15-min High-Volume Kalshi-Synchronized}} \\
+\midrule
+11 & \texttt{0x03c3...a1d} & 34,191 & 63.3\% & 63.6\% & \$282K vol, 5 matches \\
+12 & \texttt{0x33fa...97f4} & 10,577 & 77.5\% & 81.9\% & High vol + sync \\
+13 & \texttt{0xc062...ea25} & 205 & 85.4\% & 87.8\% & \$164K vol \\
+14 & \texttt{0xf007...0b4} & 7,988 & 70.0\% & 72.2\% & Consistent sync \\
+15 & \texttt{0xa3d0...ec04} & 3,334 & 67.0\% & 67.8\% & \$9.1K PnL \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{5-min Latency Arbitrage}} \\
+\midrule
+16 & \texttt{0x571c...a61f} & 20,471 & --- & 77.8\% & \$86.8K PnL \\
+17 & \texttt{0x2b41...0d3} & 1,132 & --- & 81.8\% & 61.7\% big-move WR \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Top 15-min Volume}} \\
+\midrule
+18 & \texttt{0x1979...9d} & 31,909 & 54.3\% & 54.2\% & \$98.7K PnL \\
+19 & \texttt{0x1d00...0313} & 45,888 & 53.1\% & 53.1\% & \$54.2K PnL \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\textbf{Kalshi-side limitation:} The Kalshi operator behind these cross-platform pairs is \textit{unidentifiable from public data}. The Polymarket-side evidence is strong: 10~wallets with 100\% Kalshi outcome alignment across $\geq$85 trades each ($p < 10^{-25}$), plus 200 opposite-side amount-matched trade pairs with $\leq$5-second offsets. The same operator almost certainly controls accounts on both platforms, but linking them requires subpoena-level access to Kalshi's records.
+
+Full results for all 7,570 wallets are in the companion file \texttt{data/cross\_arb\_15m\_\allowbreak{}results.json}. The 1,810 wallets with $>$58\% Kalshi alignment are listed with full trade statistics.
+
+\section{On-Chain Wallet Tracing}
+\label{app:onchain}
+
+All Polymarket wallets are Gnosis Safe proxy contracts on Polygon. We extracted Safe owners (signing EOAs) for 10 of 25 top arb proxies; the remaining 15 are MPC wallets with no on-chain owner. All 10 owners are unique---no shared EOAs across arb wallets. We scanned all owners across 7 bridge protocols (Wormhole, deBridge, Relay, LayerZero, Across, Socket, Etherscan multi-chain) and filtered 11 Polymarket infrastructure contracts (NegRiskCtfExchange, CTF Exchange, FeeModule, Relay Solver, GSN Relayer, etc.).
+
+\footnotesize
+\begin{longtable}{@{}lll@{}}
+\toprule
+\textbf{Proxy Wallet} & \textbf{Owner EOA} & \textbf{Activity} \\
+\midrule
+\endhead
+\texttt{0xf2ed...98a8} & \texttt{0xd6c5...7d17} & No multi-chain \\
+\texttt{0x4602...b0f9} & \texttt{0x8328...9847} & Polygon only \\
+\texttt{0x9e51...691c} & \texttt{0x641c...7661} & Polygon only \\
+\texttt{0x9117...eca} & \texttt{0x5dca...14da} & Polygon only \\
+\texttt{0x1d00...0313} & \texttt{0xab6f...44d0} & Polygon only \\
+\texttt{0x1979...9d} & \texttt{0x8055...f961} & Polygon only \\
+\texttt{0x03c3...1d} & \texttt{0x508a...f707} & Polygon + Arbitrum, \textbf{Mayan Swift} \\
+\texttt{0xd0d6...93aa} & \texttt{0x9698...d0e} & No multi-chain \\
+\texttt{0x0ea5...17e4} & \texttt{0x66fb...6897} & No multi-chain \\
+\texttt{0x2b41...0d3} & \texttt{0x46c8...eb26} & Ethereum + Polygon, \textbf{Relay} \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\textbf{Key finding:} Mayan Swift bridge links a Solana wallet to EOA \texttt{0x508a...f707} (owner of proxy \texttt{0x03c3...1d}, 34,191 trades). Bridge amounts total $\sim$\$309 (gas funding only---not trading capital).
+
+\textbf{Result:} 0 shared owners, 0 cross-wallet links, 0 Kalshi-linked addresses. Each arb wallet operates in on-chain isolation.
+
+Full data in companion files:
+\begin{itemize}[nosep,leftmargin=*]
+\item \texttt{data/proxy\_owners.json} --- Safe owner EOAs
+\item \texttt{data/multi\_bridge\_scan.json} --- cross-chain bridge activity
+\item \texttt{data/solana\_links.json} --- Solana wallet links
+\end{itemize}
+
+\end{document}

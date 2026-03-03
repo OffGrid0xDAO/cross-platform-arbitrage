@@ -1,0 +1,1092 @@
+{
+  "timestamp": "2026-02-27T19:46:48.704239+00:00",
+  "wallets_scanned": 25,
+  "bridges_checked": [],
+  "hits": [
+    {
+      "wallet": "0xf2eda2eca20eea27bdb0038bc3fc559e2cbb98a8",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x4602411d7a9ca3004813da8fec7b46d27d72b0f9",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x9e51207b5fbb6cfe64d656ca73a4d8f2278b691c",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x91176db78ea5d0d1566ee028120137e1bfaececa",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xf3408ba8b1427564005fb5720c495f430958e55b",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x69786a14667cf010a87ce31ad4ea278b6a9bed38",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x10e052124fdfe8a8b66811a4e0c4c19ffa26b38a",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        },
+        {
+          "bridge": "multichain_activity",
+          "chains": [
+            {
+              "chain": "Ethereum",
+              "chain_id": 1,
+              "tx_count": 3,
+              "sample_method": ""
+            },
+            {
+              "chain": "Polygon",
+              "chain_id": 137,
+              "tx_count": 5,
+              "sample_method": "redeemPositions(address collateralToken,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x33fa1a226618ead17e49717867cf242b3fe597f4",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        },
+        {
+          "bridge": "multichain_activity",
+          "chains": [
+            {
+              "chain": "Ethereum",
+              "chain_id": 1,
+              "tx_count": 5,
+              "sample_method": ""
+            },
+            {
+              "chain": "Polygon",
+              "chain_id": 137,
+              "tx_count": 5,
+              "sample_method": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xc0629caf9a88dc6ce0b4980c393ef600949bea25",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x537494c54dee9162534675712f2e625c9713042e",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xe041d09715148a9a4a7a881a5580da2c0701f2e5",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x1d0034134e339a309700ff2d34e99fa2d48b0313",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x1979ae6b7e6534de9c4539d0c205e582ca637c9d",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x03c3b0236c5a01051381482e77f2210349073a1d",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xd0d6053c3c37e727402d84c14069780d360993aa",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        },
+        {
+          "bridge": "multichain_activity",
+          "chains": [
+            {
+              "chain": "Polygon",
+              "chain_id": 137,
+              "tx_count": 5,
+              "sample_method": "execTransaction(address to, uint256 valu"
+            },
+            {
+              "chain": "Arbitrum",
+              "chain_id": 42161,
+              "tx_count": 1,
+              "sample_method": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xbd7d453564deca2bd3b3d51091105e94270dd7d1",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x583a7e4e2ec324ccdb4811e66eb8168d9aa2aff6",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xa07a9fd88723a49e32761eef7b4677aaa3299832",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xabb4affae8fef5eadaa3ec9ffd3e9bae18215ff4",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x17dea5a4fcc9056edc127bb6b0ac931c87accb7b",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xf5c66d830871a9f9b23bf053087a71c37c230a29",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x986b121c40e715167dde178b8520bf132a57bdc6",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0xd36ec33c8bed5a9f7b6630855f1533455b98a418",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x0ea574f3204c5c9c0cdead90392ea0990f4d17e4",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wallet": "0x2b41a72490ca2af2709e34368e6697cdd32fe0d3",
+      "hits": [
+        {
+          "bridge": "across",
+          "count": 10,
+          "details": [
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "12251965654115302",
+              "token": "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4473214",
+              "token": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 42161,
+              "amount": "1564068153680000",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 8453,
+              "amount": "4478631330265471",
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            },
+            {
+              "src_chain": "?",
+              "dst_chain": 1,
+              "amount": "510000000000000",
+              "token": "0x4200000000000000000000000000000000000006"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "bridge_totals": {
+    "wormhole": 0,
+    "debridge": 0,
+    "relay": 0,
+    "layerzero": 0,
+    "across": 25,
+    "socket": 0,
+    "multichain": 3
+  }
+}

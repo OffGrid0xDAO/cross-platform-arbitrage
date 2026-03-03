@@ -1,0 +1,201 @@
+{
+  "timestamp": "2026-03-02T17:37:20.480697+00:00",
+  "dataset": "Polymarket 15-min + Kalshi 15-min, Feb 19-25 2026",
+  "pnl_decomposition": [
+    {
+      "strategy": "latency_arb",
+      "wallets": 494,
+      "trades": 54299,
+      "wins": 50796,
+      "wr": 0.9355,
+      "gross_pnl": 26717.61,
+      "volume": 3330160.31,
+      "gas_cost": 542.99,
+      "net_pnl": 26174.62,
+      "roi_pct": 0.79,
+      "avg_price": 0.9222,
+      "avg_entry_secs": 812.3,
+      "avg_size": 73.0,
+      "annualized_pnl": 1706025.0
+    },
+    {
+      "strategy": "sell_cluster",
+      "wallets": 506,
+      "trades": 151431,
+      "wins": 102211,
+      "wr": 0.675,
+      "gross_pnl": 28549.14,
+      "volume": 1096530.41,
+      "gas_cost": 1514.31,
+      "net_pnl": 27034.83,
+      "roi_pct": 2.47,
+      "avg_price": 0.3263,
+      "avg_entry_secs": 455.1,
+      "avg_size": 13.27,
+      "annualized_pnl": 1762091.0
+    },
+    {
+      "strategy": "market_maker",
+      "wallets": 3255,
+      "trades": 1831650,
+      "wins": 960659,
+      "wr": 0.5245,
+      "gross_pnl": 384915.39,
+      "volume": 20459469.13,
+      "gas_cost": 18316.5,
+      "net_pnl": 366598.89,
+      "roi_pct": 1.79,
+      "avg_price": 0.5762,
+      "avg_entry_secs": 490.6,
+      "avg_size": 27.36,
+      "annualized_pnl": 23894392.0
+    },
+    {
+      "strategy": "informed",
+      "wallets": 1180,
+      "trades": 230991,
+      "wins": 201234,
+      "wr": 0.8712,
+      "gross_pnl": 96379.48,
+      "volume": 4160131.31,
+      "gas_cost": 2309.91,
+      "net_pnl": 94069.57,
+      "roi_pct": 2.26,
+      "avg_price": 0.849,
+      "avg_entry_secs": 579.1,
+      "avg_size": 26.54,
+      "annualized_pnl": 6131320.0
+    },
+    {
+      "strategy": "retail",
+      "wallets": 7956,
+      "trades": 253360,
+      "wins": 109532,
+      "wr": 0.4323,
+      "gross_pnl": -211974.83,
+      "volume": 4420858.91,
+      "gas_cost": 2533.6,
+      "net_pnl": -214508.43,
+      "roi_pct": -4.85,
+      "avg_price": 0.4909,
+      "avg_entry_secs": 410.7,
+      "avg_size": 45.04,
+      "annualized_pnl": -13981353.0
+    }
+  ],
+  "temporal_stationarity": [
+    {
+      "date": "2026-02-19",
+      "windows": 96,
+      "trades": 68102,
+      "wins": 56214,
+      "wr": 0.8254,
+      "pnl": 21681.08,
+      "volume": 1522501.12,
+      "arb_wallets_active": 1446,
+      "new_arb_wallets": 1446,
+      "pnl_per_window": 225.84
+    },
+    {
+      "date": "2026-02-20",
+      "windows": 96,
+      "trades": 75594,
+      "wins": 60120,
+      "wr": 0.7953,
+      "pnl": 30530.97,
+      "volume": 1446747.21,
+      "arb_wallets_active": 1491,
+      "new_arb_wallets": 211,
+      "pnl_per_window": 318.03
+    },
+    {
+      "date": "2026-02-21",
+      "windows": 96,
+      "trades": 53660,
+      "wins": 41428,
+      "wr": 0.772,
+      "pnl": 27505.1,
+      "volume": 955833.43,
+      "arb_wallets_active": 1346,
+      "new_arb_wallets": 142,
+      "pnl_per_window": 286.51
+    },
+    {
+      "date": "2026-02-22",
+      "windows": 96,
+      "trades": 50911,
+      "wins": 40274,
+      "wr": 0.7911,
+      "pnl": 14366.94,
+      "volume": 899707.16,
+      "arb_wallets_active": 1394,
+      "new_arb_wallets": 133,
+      "pnl_per_window": 149.66
+    },
+    {
+      "date": "2026-02-23",
+      "windows": 96,
+      "trades": 64993,
+      "wins": 53332,
+      "wr": 0.8206,
+      "pnl": 19474.72,
+      "volume": 1102696.07,
+      "arb_wallets_active": 1492,
+      "new_arb_wallets": 128,
+      "pnl_per_window": 202.86
+    },
+    {
+      "date": "2026-02-24",
+      "windows": 96,
+      "trades": 59726,
+      "wins": 49064,
+      "wr": 0.8215,
+      "pnl": 10020.53,
+      "volume": 1268119.67,
+      "arb_wallets_active": 1511,
+      "new_arb_wallets": 70,
+      "pnl_per_window": 104.38
+    },
+    {
+      "date": "2026-02-25",
+      "windows": 96,
+      "trades": 63735,
+      "wins": 53809,
+      "wr": 0.8443,
+      "pnl": 28066.9,
+      "volume": 1391217.38,
+      "arb_wallets_active": 1465,
+      "new_arb_wallets": 50,
+      "pnl_per_window": 292.36
+    }
+  ],
+  "loss_distribution": [
+    {
+      "type": "market_maker",
+      "gross_loss": 6334443.2,
+      "losing_trades": 870991,
+      "volume": 6334443.2,
+      "arb_attributed": 542626.63,
+      "pct_of_arb_funding": 74.8,
+      "avg_loss_per_trade": 7.2727
+    },
+    {
+      "type": "retail",
+      "gross_loss": 1330845.89,
+      "losing_trades": 151819,
+      "volume": 1330845.89,
+      "arb_attributed": 127080.96,
+      "pct_of_arb_funding": 17.5,
+      "avg_loss_per_trade": 8.766
+    },
+    {
+      "type": "other_arb",
+      "gross_loss": 573364.65,
+      "losing_trades": 82480,
+      "volume": 573364.65,
+      "arb_attributed": 55303.3,
+      "pct_of_arb_funding": 7.6,
+      "avg_loss_per_trade": 6.9516
+    }
+  ]
+}
